@@ -9,6 +9,8 @@ plugins {
     id("com.google.dagger.hilt.android")
     // Google services
     id("com.google.gms.google-services")
+    // Parcelize
+    id("kotlin-parcelize")
 }
 
 android {
@@ -81,6 +83,7 @@ dependencies {
 
     // Compose
     implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
 
     // Hilt
     val hiltVersion = "2.48.1"
@@ -98,4 +101,7 @@ dependencies {
     // Auth
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
+
+    // Coil
+    implementation("io.coil-kt:coil-compose:2.4.0")
 }
