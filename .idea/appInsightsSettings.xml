@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.android.maxclub.firenotes" />
+                  <option name="mobileSdkAppId" value="1:1041457834513:android:4f1d6683675b4a6ffe9fb0" />
+                  <option name="projectId" value="firenotes-e9f32" />
+                  <option name="projectNumber" value="1041457834513" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
