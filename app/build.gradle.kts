@@ -19,7 +19,7 @@ android {
 
     defaultConfig {
         applicationId = "com.android.maxclub.firenotes"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "0.1.0"
