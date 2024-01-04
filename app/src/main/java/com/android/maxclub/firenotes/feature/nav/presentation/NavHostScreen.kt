@@ -16,7 +16,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.android.maxclub.firenotes.core.Screen
 import com.android.maxclub.firenotes.feature.auth.presentation.SignInScreen
 import com.android.maxclub.firenotes.feature.notes.presentation.NotesScreen
 import kotlinx.coroutines.flow.collectLatest

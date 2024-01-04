@@ -102,6 +102,9 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
 
+    // Firestore
+    implementation("com.google.firebase:firebase-firestore:24.10.0")
+
     // Coil
     implementation("io.coil-kt:coil-compose:2.4.0")
 }

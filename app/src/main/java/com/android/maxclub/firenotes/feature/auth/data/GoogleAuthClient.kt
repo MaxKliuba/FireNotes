@@ -54,7 +54,7 @@ class GoogleAuthClient @Inject constructor(
                 auth.removeAuthStateListener(authStateListener)
             }
         }.stateIn(
-            scope = CoroutineScope(Dispatchers.Default),
+            scope = CoroutineScope(Dispatchers.IO),
             started = SharingStarted.Eagerly,
             initialValue = auth.currentUser?.toUser()
         )
