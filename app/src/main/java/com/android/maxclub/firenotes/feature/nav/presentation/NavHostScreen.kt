@@ -27,6 +27,7 @@ fun NavHostScreen(
 ) {
     val context = LocalContext.current
 
+    val isSigningIn by viewModel.isSigningIn
     val currentUser by viewModel.currentUser.collectAsState()
     val startDestination by remember {
         derivedStateOf {
@@ -67,7 +68,10 @@ fun NavHostScreen(
         startDestination = startDestination,
     ) {
         composable(route = Screen.SignIn.route) {
-            SignInScreen(onSignIn = viewModel::beginSignIn)
+            SignInScreen(
+                isSigningIn = isSigningIn,
+                onSignIn = viewModel::beginSignIn
+            )
         }
 
         composable(route = Screen.Notes.route) {

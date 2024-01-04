@@ -29,8 +29,19 @@ class GoogleAuthClient @Inject constructor(
     private val signInClient: SignInClient
 ) : AuthClient {
 
-    val auth = Firebase.auth
+    private val auth = Firebase.auth
     private val webClientId = BuildConfig.WEB_CLIENT_ID
+    private val signInRequest: BeginSignInRequest =
+        BeginSignInRequest.Builder()
+            .setGoogleIdTokenRequestOptions(
+                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                    .setSupported(true)
+                    .setFilterByAuthorizedAccounts(false)
+                    .setServerClientId(webClientId)
+                    .build()
+            )
+            .setAutoSelectEnabled(true)
+            .build()
 
     override val currentUser: StateFlow<User?>
         get() = callbackFlow {
@@ -51,13 +62,13 @@ class GoogleAuthClient @Inject constructor(
     @Throws(SignInException::class)
     override suspend fun beginSignIn(): IntentSender? =
         try {
-            signInClient.beginSignIn(buildSignInRequest()).await()
+            signInClient.beginSignIn(signInRequest).await()
                 ?.pendingIntent?.intentSender
         } catch (e: Exception) {
             if (e is CancellationException) {
                 throw e
             } else {
-                throw SignInException(e.message ?: "Sign-in failed")
+                throw SignInException(e.localizedMessage ?: "Sign-In failed")
             }
         }
 
@@ -73,7 +84,7 @@ class GoogleAuthClient @Inject constructor(
             if (e is CancellationException) {
                 throw e
             } else {
-                throw SignInException(e.message ?: "Sign-in failed")
+                throw SignInException(e.localizedMessage ?: "Sign-In failed")
             }
         }
     }
@@ -87,20 +98,8 @@ class GoogleAuthClient @Inject constructor(
             if (e is CancellationException) {
                 throw e
             } else {
-                throw SignOutException(e.message ?: "Sign-out failed")
+                throw SignOutException(e.localizedMessage ?: "Sign-Out failed")
             }
         }
     }
-
-    private fun buildSignInRequest(): BeginSignInRequest =
-        BeginSignInRequest.Builder()
-            .setGoogleIdTokenRequestOptions(
-                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                    .setSupported(true)
-                    .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(webClientId)
-                    .build()
-            )
-            .setAutoSelectEnabled(true)
-            .build()
 }
