@@ -84,6 +84,8 @@ dependencies {
     // Compose
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.6")
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 
     // Hilt
     val hiltVersion = "2.48.1"

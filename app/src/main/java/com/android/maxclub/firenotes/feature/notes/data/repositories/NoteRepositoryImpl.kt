@@ -49,14 +49,40 @@ class NoteRepositoryImpl @Inject constructor(
             .await()
     }
 
-    override suspend fun deleteNoteItemById(noteItemId: String) {
+    override suspend fun updateNoteItemChecked(noteItemId: String, checked: Boolean) {
         firestore.collection(collectionPath)
             .document(noteItemId)
-            .update("isDeleted", true)
+            .update("checked", checked)
             .await()
     }
 
-    override suspend fun deletePermanentlyNoteItemById(noteItemId: String) {
+    override suspend fun updateNoteItemContent(noteItemId: String, content: String) {
+        firestore.collection(collectionPath)
+            .document(noteItemId)
+            .update("content", content)
+            .await()
+    }
+
+    override suspend fun updateAllNoteItemPositions(vararg noteItems: NoteItem) {
+        val batch = firestore.batch()
+
+        noteItems.forEach { noteItem ->
+            val documentRef = firestore.collection(collectionPath)
+                .document(noteItem.id)
+            batch.update(documentRef, "position", noteItem.position)
+        }
+
+        batch.commit().await()
+    }
+
+    override suspend fun deleteNoteItemById(noteItemId: String) {
+        firestore.collection(collectionPath)
+            .document(noteItemId)
+            .update("deleted", true)
+            .await()
+    }
+
+    override suspend fun deletePermanentlyNoteItem(noteItemId: String) {
         firestore.collection(collectionPath)
             .document(noteItemId)
             .delete()
@@ -66,7 +92,7 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun tryRestoreNoteItemById(noteItemId: String) {
         firestore.collection(collectionPath)
             .document(noteItemId)
-            .update("isDeleted", false)
+            .update("deleted", false)
             .await()
     }
 

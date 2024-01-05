@@ -17,7 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.android.maxclub.firenotes.feature.auth.presentation.SignInScreen
-import com.android.maxclub.firenotes.feature.notes.presentation.NotesScreen
+import com.android.maxclub.firenotes.feature.notes.presentation.AddEditNoteScreen
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -30,7 +30,7 @@ fun NavHostScreen(
     val currentUser by viewModel.currentUser.collectAsState()
     val startDestination by remember {
         derivedStateOf {
-            if (currentUser == null) Screen.SignIn.route else Screen.Notes.route
+            if (currentUser == null) Screen.SignIn.route else Screen.AddEditNote.route
         }
     }
 
@@ -73,8 +73,8 @@ fun NavHostScreen(
             )
         }
 
-        composable(route = Screen.Notes.route) {
-            NotesScreen(
+        composable(route = Screen.AddEditNote.route) {
+            AddEditNoteScreen(
                 currentUser = currentUser,
                 onSignOut = viewModel::signOut
             )

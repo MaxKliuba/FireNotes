@@ -26,7 +26,7 @@ import com.android.maxclub.firenotes.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotesTopAppBar(
+fun AddEditNoteTopAppBar(
     userPhotoUrl: String?,
     onClickUserPhoto: () -> Unit,
     isDeleteIconVisible: Boolean,
@@ -52,7 +52,7 @@ fun NotesTopAppBar(
                     } else {
                         null
                     },
-                    contentDescription = "User",
+                    contentDescription = stringResource(R.string.menu_title),
                     modifier = Modifier
                         .size(36.dp)
                         .clip(CircleShape)
@@ -70,7 +70,7 @@ fun NotesTopAppBar(
                 IconButton(onClick = onDelete) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
+                        contentDescription = stringResource(R.string.delete_note_text),
                     )
                 }
             }

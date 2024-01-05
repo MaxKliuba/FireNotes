@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">FireNotes</string>
     <string name="sign_in_text">Sign In</string>
+    <string name="menu_title">Menu</string>
+    <string name="add_item_text">Add item</string>
+    <string name="delete_note_item_text">Delete item</string>
+    <string name="delete_note_text">Delete note</string>
 </resources>

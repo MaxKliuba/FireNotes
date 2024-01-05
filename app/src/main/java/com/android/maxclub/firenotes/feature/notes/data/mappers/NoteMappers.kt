@@ -6,14 +6,14 @@ import com.android.maxclub.firenotes.feature.notes.domain.models.NoteItem
 fun NoteItemDto.toNoteItem(noteItemId: String): NoteItem =
     NoteItem(
         id = noteItemId,
-        isChecked = isChecked,
+        checked = checked,
         content = content,
         position = position,
     )
 
 fun NoteItem.toNoteDtoItem(): NoteItemDto =
     NoteItemDto(
-        isChecked = isChecked,
+        checked = checked,
         content = content,
         position = position,
     )
