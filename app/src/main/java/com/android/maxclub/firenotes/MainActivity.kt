@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.android.maxclub.firenotes.feature.nav.presentation.NavHostScreen
+import com.android.maxclub.firenotes.feature.main.presentation.MainScreenContainer
 import com.android.maxclub.firenotes.ui.theme.FireNotesTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    NavHostScreen()
+                    MainScreenContainer()
                 }
             }
         }

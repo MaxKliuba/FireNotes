@@ -25,3 +25,19 @@ fun <T, V> CoroutineScope.debounce(
         }
     }
 }
+
+fun <T, K, V> CoroutineScope.debounce(
+    timeoutMillis: Long = 300L,
+    block: suspend (T, K, V) -> Unit
+): (T, K, V) -> Unit {
+    var job: Job? = null
+
+    return { param1: T, param2: K, param3: V ->
+        job?.cancel() // Cancel the previous debounce job
+
+        job = launch {
+            delay(timeoutMillis)
+            block(param1, param2, param3)
+        }
+    }
+}

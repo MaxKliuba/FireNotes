@@ -114,7 +114,7 @@ fun SignInSection(
                 Icon(imageVector = Icons.Default.Login, contentDescription = null)
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = stringResource(R.string.sign_in_text))
+            Text(text = stringResource(R.string.sign_in_button))
         }
 
         Image(

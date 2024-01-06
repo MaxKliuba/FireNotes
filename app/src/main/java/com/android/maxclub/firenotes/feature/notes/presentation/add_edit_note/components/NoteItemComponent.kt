@@ -1,4 +1,4 @@
-package com.android.maxclub.firenotes.feature.notes.presentation.components
+package com.android.maxclub.firenotes.feature.notes.presentation.add_edit_note.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -76,7 +76,7 @@ fun NoteItemComponent(
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.delete_note_item_text),
+                contentDescription = stringResource(R.string.delete_note_item_button),
             )
         }
     }

@@ -1,4 +1,4 @@
-package com.android.maxclub.firenotes.feature.notes.presentation.components
+package com.android.maxclub.firenotes.feature.notes.presentation.add_edit_note.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth

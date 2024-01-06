@@ -1,4 +1,4 @@
-package com.android.maxclub.firenotes.feature.notes.presentation
+package com.android.maxclub.firenotes.feature.notes.presentation.notes
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,31 +17,32 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.maxclub.firenotes.R
 import com.android.maxclub.firenotes.feature.auth.domain.models.User
-import com.android.maxclub.firenotes.feature.notes.presentation.components.NoteItemList
-import com.android.maxclub.firenotes.feature.notes.presentation.components.AddEditNoteTopAppBar
+import com.android.maxclub.firenotes.feature.notes.presentation.notes.components.NoteList
+import com.android.maxclub.firenotes.feature.notes.presentation.notes.components.NotesTopAppBar
 
 @Composable
-fun AddEditNoteScreen(
+fun NotesScreen(
     currentUser: User?,
     onSignOut: () -> Unit,
-    viewModel: AddEditNoteViewModel = hiltViewModel()
+    onAddNote: () -> Unit,
+    onEditNote: (String) -> Unit,
+    onDeleteNote: (String) -> Unit,
+    viewModel: NotesViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState
 
     Scaffold(
         topBar = {
-            AddEditNoteTopAppBar(
+            NotesTopAppBar(
                 userPhotoUrl = currentUser?.photoUrl,
                 onClickUserPhoto = onSignOut,
-                isDeleteIconVisible = state.noteItems.isNotEmpty(),
-                onDelete = viewModel::deleteAllNoteItems
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = viewModel::addNoteItem) {
+            FloatingActionButton(onClick = onAddNote) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_item_text),
+                    contentDescription = stringResource(R.string.add_note_button),
                 )
             }
         }
@@ -57,13 +58,12 @@ fun AddEditNoteScreen(
                 )
             }
 
-            NoteItemList(
-                noteItems = state.noteItems,
-                onNoteItemCheckedChange = viewModel::updateNoteItemChecked,
-                onNoteItemContentChange = viewModel::updateNoteItemContent,
-                onLocalNoteItemsReorder = viewModel::reorderLocalNoteItems,
-                onApplyNoteItemsReorder = viewModel::applyNoteItemsReorder,
-                onNoteItemDelete = viewModel::deleteNoteItem,
+            NoteList(
+                notes = state.notes,
+                onLocalNotesReorder = viewModel::reorderLocalNotes,
+                onApplyNotesReorder = viewModel::applyNotesReorder,
+                onNoteEdit = onEditNote,
+                onNoteDelete = onDeleteNote,
                 modifier = Modifier.fillMaxSize()
             )
         }
