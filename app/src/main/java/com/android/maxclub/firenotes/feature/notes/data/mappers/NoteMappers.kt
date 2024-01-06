@@ -18,6 +18,7 @@ fun NoteDto.toNote(noteId: String): Note? =
     takeUnless { it.deleted }?.let {
         Note(
             title = title,
+            timestamp = timestamp,
             position = position,
             items = emptyList(),
             id = noteId,
@@ -27,5 +28,6 @@ fun NoteDto.toNote(noteId: String): Note? =
 fun Note.toNoteDto(): NoteDto =
     NoteDto(
         title = title,
+        timestamp = timestamp,
         position = position,
     )

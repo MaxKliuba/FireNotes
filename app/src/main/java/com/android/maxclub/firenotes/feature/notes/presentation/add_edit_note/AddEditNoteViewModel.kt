@@ -131,6 +131,7 @@ class AddEditNoteViewModel @Inject constructor(
             val newNoteId = if (noteId == Screen.AddEditNote.DEFAULT_NOTE_ID) {
                 val note = Note(
                     title = "",
+                    timestamp = Date().time,
                     position = Date().time,
                 )
                 noteRepository.addNote(note)

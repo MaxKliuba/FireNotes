@@ -12,14 +12,19 @@ import com.android.maxclub.firenotes.feature.notes.domain.models.Note
 import com.android.maxclub.firenotes.feature.notes.domain.models.NoteItem
 import com.android.maxclub.firenotes.feature.notes.domain.models.NoteWithItemsCount
 import com.android.maxclub.firenotes.feature.notes.domain.repositories.NoteRepository
+import com.google.firebase.firestore.WriteBatch
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.util.Date
 import javax.inject.Inject
 
 class NoteRepositoryImpl @Inject constructor(
@@ -30,40 +35,33 @@ class NoteRepositoryImpl @Inject constructor(
     private val collectionPath: String
         get() = "users/${authClient.currentUser.value?.id}/notes"
 
-    private fun getNoteItems(noteId: String): Flow<List<NoteItem>> = callbackFlow {
-        val snapshotListener = firestore.collection(collectionPath)
-            .document(noteId)
-            .collection(ITEMS_COLLECTION_NAME)
-            .addSnapshotListener { querySnapshot, error ->
-                querySnapshot?.documents?.let { documents ->
-                    val noteItems = documents.mapNotNull { document ->
-                        document.toObject<NoteItemDto>()?.toNoteItem(document.id)
-                    }
-
-                    trySend(noteItems)
-                }
-
-                error?.printStackTrace()
-            }
-
-        awaitClose {
-            snapshotListener.remove()
-        }
-    }
-
     /*
      * Note
      */
     override fun getNotes(): Flow<List<NoteWithItemsCount>> = callbackFlow {
+        val scope = this
+
         val snapshotListener = firestore.collection(collectionPath)
             .addSnapshotListener { querySnapshot, error ->
                 querySnapshot?.documents?.let { documents ->
-                    val notes = documents.mapNotNull { document ->
-                        document.toObject<NoteDto>()
-                            ?.takeUnless { it.deleted }
-                            ?.toNoteWithItemsCount(document.id, 0)
+                    scope.launch {
+                        val notes = documents.mapNotNull { document ->
+                            async {
+                                val itemsCount =
+                                    document.reference.collection(ITEMS_COLLECTION_NAME)
+                                        .get().await()
+                                        .documents.mapNotNull { it.toObject<NoteItemDto>() }
+                                        .count { !it.deleted }
+
+                                document.toObject<NoteDto>()
+                                    ?.takeUnless { it.deleted }
+                                    ?.toNoteWithItemsCount(document.id, itemsCount)
+                            }
+                        }.awaitAll()
+                            .filterNotNull()
+
+                        trySend(notes)
                     }
-                    trySend(notes)
                 }
 
                 error?.printStackTrace()
@@ -101,10 +99,11 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateNoteTitle(noteId: String, title: String) {
-        firestore.collection(collectionPath)
-            .document(noteId)
-            .update(TITLE_FIELD, title)
-            .await()
+        val documentRef = firestore.collection(collectionPath).document(noteId)
+        firestore.batch()
+            .update(documentRef, TITLE_FIELD, title)
+            .withNoteTimestampUpdate(noteId)
+            .commit().await()
     }
 
     override suspend fun updateAllNotesPositions(vararg notes: NoteWithItemsCount) {
@@ -148,6 +147,10 @@ class NoteRepositoryImpl @Inject constructor(
             .collection(ITEMS_COLLECTION_NAME)
             .add(noteItem.toNoteDtoItem())
             .await()
+
+        firestore.batch()
+            .withNoteTimestampUpdate(noteId)
+            .commit().await()
     }
 
     override suspend fun updateNoteItemChecked(
@@ -155,12 +158,14 @@ class NoteRepositoryImpl @Inject constructor(
         noteItemId: String,
         checked: Boolean
     ) {
-        firestore.collection(collectionPath)
+        val documentRef = firestore.collection(collectionPath)
             .document(noteId)
             .collection(ITEMS_COLLECTION_NAME)
             .document(noteItemId)
-            .update(CHECKED_FIELD, checked)
-            .await()
+        firestore.batch()
+            .update(documentRef, CHECKED_FIELD, checked)
+            .withNoteTimestampUpdate(noteId)
+            .commit().await()
     }
 
     override suspend fun updateNoteItemContent(
@@ -168,12 +173,14 @@ class NoteRepositoryImpl @Inject constructor(
         noteItemId: String,
         content: String
     ) {
-        firestore.collection(collectionPath)
+        val documentRef = firestore.collection(collectionPath)
             .document(noteId)
             .collection(ITEMS_COLLECTION_NAME)
             .document(noteItemId)
-            .update(CONTENT_FIELD, content)
-            .await()
+        firestore.batch()
+            .update(documentRef, CONTENT_FIELD, content)
+            .withNoteTimestampUpdate(noteId)
+            .commit().await()
     }
 
     override suspend fun updateAllNoteItemsPositions(noteId: String, vararg noteItems: NoteItem) {
@@ -187,39 +194,79 @@ class NoteRepositoryImpl @Inject constructor(
             batch.update(documentRef, POSITION_FIELD, noteItem.position)
         }
 
-        batch.commit().await()
+        batch.withNoteTimestampUpdate(noteId)
+            .commit().await()
     }
 
     override suspend fun deleteNoteItemById(noteId: String, noteItemId: String) {
-        firestore.collection(collectionPath)
+        val documentRef = firestore.collection(collectionPath)
             .document(noteId)
             .collection(ITEMS_COLLECTION_NAME)
             .document(noteItemId)
-            .update(DELETED_FIELD, true)
-            .await()
+        firestore.batch()
+            .update(documentRef, DELETED_FIELD, true)
+            .withNoteTimestampUpdate(noteId)
+            .commit().await()
     }
 
     override suspend fun deletePermanentlyNoteItem(noteId: String, noteItemId: String) {
-        firestore.collection(collectionPath)
+        val documentRef = firestore.collection(collectionPath)
             .document(noteId)
             .collection(ITEMS_COLLECTION_NAME)
             .document(noteItemId)
-            .delete()
-            .await()
+        firestore.batch()
+            .delete(documentRef)
+            .withNoteTimestampUpdate(noteId)
+            .commit().await()
     }
 
     override suspend fun tryRestoreNoteItemById(noteId: String, noteItemId: String) {
-        firestore.collection(collectionPath)
+        val documentRef = firestore.collection(collectionPath)
             .document(noteId)
             .collection(ITEMS_COLLECTION_NAME)
             .document(noteItemId)
-            .update(DELETED_FIELD, false)
-            .await()
+        firestore.batch()
+            .update(documentRef, DELETED_FIELD, false)
+            .withNoteTimestampUpdate(noteId)
+            .commit().await()
     }
+
+    /*
+     * Utils
+     */
+
+    private fun getNoteItems(noteId: String): Flow<List<NoteItem>> = callbackFlow {
+        val snapshotListener = firestore.collection(collectionPath)
+            .document(noteId)
+            .collection(ITEMS_COLLECTION_NAME)
+            .addSnapshotListener { querySnapshot, error ->
+                querySnapshot?.documents?.let { documents ->
+                    val noteItems = documents.mapNotNull { document ->
+                        document.toObject<NoteItemDto>()?.toNoteItem(document.id)
+                    }
+
+                    trySend(noteItems)
+                }
+
+                error?.printStackTrace()
+            }
+
+        awaitClose {
+            snapshotListener.remove()
+        }
+    }
+
+    private fun WriteBatch.withNoteTimestampUpdate(noteId: String): WriteBatch {
+        val documentRef = firestore.collection(collectionPath).document(noteId)
+
+        return update(documentRef, TIMESTAMP_FIELD, Date().time)
+    }
+
 
     companion object {
         private const val ITEMS_COLLECTION_NAME = "items"
         private const val TITLE_FIELD = "title"
+        private const val TIMESTAMP_FIELD = "timestamp"
         private const val POSITION_FIELD = "position"
         private const val DELETED_FIELD = "deleted"
         private const val CHECKED_FIELD = "checked"
