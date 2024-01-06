@@ -50,11 +50,11 @@ class NoteRepositoryImpl @Inject constructor(
                                 val itemsCount =
                                     document.reference.collection(ITEMS_COLLECTION_NAME)
                                         .get().await()
-                                        .documents.mapNotNull { it.toObject<NoteItemDto>() }
-                                        .count { !it.deleted }
+                                        .documents.mapNotNull {
+                                            it.toObject<NoteItemDto>()?.toNoteItem(it.id)
+                                        }.count()
 
                                 document.toObject<NoteDto>()
-                                    ?.takeUnless { it.deleted }
                                     ?.toNoteWithItemsCount(document.id, itemsCount)
                             }
                         }.awaitAll()
