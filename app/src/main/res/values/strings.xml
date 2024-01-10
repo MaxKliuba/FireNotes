@@ -4,19 +4,25 @@
     <string name="language">en</string>
     <string name="country" />
 
+    <string name="back_button">Back</string>
+
     <string name="sign_in_button">Sign In</string>
 
-    <string name="menu_title">Menu</string>
+    <string name="profile_button">Profile</string>
+    <string name="sign_out_button">Sign Out</string>
     <string name="add_note_button">Add note</string>
     <string name="delete_note_button">Delete note</string>
+    <plurals name="note_plural">
+        <item quantity="one">%1$d note</item>
+        <item quantity="other">%1$d notes</item>
+    </plurals>
     <plurals name="item_plural">
         <item quantity="one">%1$d item</item>
         <item quantity="other">%1$d items</item>
     </plurals>
 
     <string name="note_title_placeholder">Title</string>
+    <string name="share_note_button">Share note</string>
     <string name="add_item_button">Add item</string>
     <string name="delete_note_item_button">Delete item</string>
-    <string name="back_button">Back</string>
-    <string name="share_note_button">Share note</string>
 </resources>

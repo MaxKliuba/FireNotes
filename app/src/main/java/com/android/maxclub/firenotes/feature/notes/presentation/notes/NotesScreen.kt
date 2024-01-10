@@ -19,6 +19,7 @@ import com.android.maxclub.firenotes.R
 import com.android.maxclub.firenotes.feature.auth.domain.models.User
 import com.android.maxclub.firenotes.feature.notes.presentation.notes.components.NoteList
 import com.android.maxclub.firenotes.feature.notes.presentation.notes.components.NotesTopAppBar
+import com.android.maxclub.firenotes.feature.notes.presentation.notes.components.UserProfileDialog
 
 @Composable
 fun NotesScreen(
@@ -31,11 +32,20 @@ fun NotesScreen(
 ) {
     val state by viewModel.uiState
 
+    if (state.isUserProfileDialogVisible) {
+        UserProfileDialog(
+            user = currentUser,
+            notesCount = state.notes.size,
+            onSignOut = onSignOut,
+            onDismiss = viewModel::hideUserProfileDialog,
+        )
+    }
+
     Scaffold(
         topBar = {
             NotesTopAppBar(
                 userPhotoUrl = currentUser?.photoUrl,
-                onClickUserPhoto = onSignOut,
+                onClickUserProfile = viewModel::showUserProfileDialog,
             )
         },
         floatingActionButton = {

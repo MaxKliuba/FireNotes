@@ -24,7 +24,7 @@ import com.android.maxclub.firenotes.R
 @Composable
 fun NotesTopAppBar(
     userPhotoUrl: String?,
-    onClickUserPhoto: () -> Unit,
+    onClickUserProfile: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -32,7 +32,7 @@ fun NotesTopAppBar(
             Text(text = stringResource(id = R.string.app_name))
         },
         actions = {
-            IconButton(onClick = onClickUserPhoto) {
+            IconButton(onClick = onClickUserProfile) {
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = userPhotoUrl,
@@ -43,7 +43,7 @@ fun NotesTopAppBar(
                     } else {
                         null
                     },
-                    contentDescription = stringResource(R.string.menu_title),
+                    contentDescription = stringResource(R.string.profile_button),
                     modifier = Modifier
                         .size(36.dp)
                         .clip(CircleShape)

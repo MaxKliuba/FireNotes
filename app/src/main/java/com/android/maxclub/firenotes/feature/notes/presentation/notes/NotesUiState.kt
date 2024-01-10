@@ -5,5 +5,6 @@ import com.android.maxclub.firenotes.feature.notes.domain.models.NoteWithItemsCo
 
 data class NotesUiState(
     val isLoading: Boolean,
+    val isUserProfileDialogVisible: Boolean,
     @Stable val notes: List<NoteWithItemsCount>,
 )

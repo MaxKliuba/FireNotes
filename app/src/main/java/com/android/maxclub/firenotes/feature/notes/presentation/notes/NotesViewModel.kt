@@ -24,6 +24,7 @@ class NotesViewModel @Inject constructor(
     private val _uiState = mutableStateOf(
         NotesUiState(
             isLoading = true,
+            isUserProfileDialogVisible = false,
             notes = emptyList(),
         )
     )
@@ -31,6 +32,14 @@ class NotesViewModel @Inject constructor(
 
     init {
         getNotes()
+    }
+
+    fun showUserProfileDialog() {
+        _uiState.update { it.copy(isUserProfileDialogVisible = true) }
+    }
+
+    fun hideUserProfileDialog() {
+        _uiState.update { it.copy(isUserProfileDialogVisible = false) }
     }
 
     fun reorderLocalNotes(fromIndex: Int, toIndex: Int) {
