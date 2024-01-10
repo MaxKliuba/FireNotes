@@ -9,6 +9,7 @@ fun NoteDto.toNoteWithItemsCount(noteId: String, itemsCount: Int): NoteWithItems
         NoteWithItemsCount(
             title = title,
             position = position,
+            timestamp = timestamp,
             itemsCount = itemsCount,
             id = noteId,
         )

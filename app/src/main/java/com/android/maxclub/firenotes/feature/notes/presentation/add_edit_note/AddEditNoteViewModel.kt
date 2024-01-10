@@ -1,11 +1,13 @@
 package com.android.maxclub.firenotes.feature.notes.presentation.add_edit_note
 
+import android.content.Intent
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.maxclub.firenotes.core.utils.debounce
+import com.android.maxclub.firenotes.core.utils.sendIn
 import com.android.maxclub.firenotes.core.utils.update
 import com.android.maxclub.firenotes.feature.main.presentation.Screen
 import com.android.maxclub.firenotes.feature.notes.domain.models.Note
@@ -13,13 +15,17 @@ import com.android.maxclub.firenotes.feature.notes.domain.models.NoteItem
 import com.android.maxclub.firenotes.feature.notes.domain.repositories.NoteRepository
 import com.android.maxclub.firenotes.feature.notes.domain.usecases.GetNoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
+
+private const val MAX_TITLE_LENGTH = 100
 
 @HiltViewModel
 class AddEditNoteViewModel @Inject constructor(
@@ -39,6 +45,9 @@ class AddEditNoteViewModel @Inject constructor(
     )
     val uiState: State<AddEditNoteUiState> = _uiState
 
+    private val uiActionChannel = Channel<AddEditNoteUiAction>()
+    val uiAction = uiActionChannel.receiveAsFlow()
+
     private val onUpdateNoteTitleWithDebounce: (String, String) -> Unit =
         viewModelScope.debounce(timeoutMillis = 500L) { noteId, title ->
             noteRepository.updateNoteTitle(noteId, title)
@@ -53,8 +62,12 @@ class AddEditNoteViewModel @Inject constructor(
         getNote(initNoteId)
     }
 
-    fun updateNoteTitle(noteId: String, title: String) {
+    fun tryUpdateNoteTitle(noteId: String, title: String): Boolean {
+        if (title.length > MAX_TITLE_LENGTH) return false
+
         onUpdateNoteTitleWithDebounce(noteId, title)
+
+        return true
     }
 
     fun addNoteItem() {
@@ -123,6 +136,26 @@ class AddEditNoteViewModel @Inject constructor(
                 noteRepository.deletePermanentlyNoteItem(note.id, noteItemId)
             }
         }
+    }
+
+    fun shareNote(note: Note) {
+        val text = "${note.title}${
+            note.items.joinToString(prefix = "\n\n", separator = "\n") { noteItem ->
+                "${if (noteItem.checked) "[*]" else "[_]"}\t${noteItem.content}"
+            }
+        }"
+
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_SUBJECT, note.title)
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        val chooserIntent = Intent.createChooser(intent, null)
+
+        uiActionChannel.sendIn(
+            AddEditNoteUiAction.LaunchShareNoteIntent(chooserIntent),
+            viewModelScope,
+        )
     }
 
     private fun getNote(noteId: String) {

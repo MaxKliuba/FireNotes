@@ -21,10 +21,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.android.maxclub.firenotes.R
+import com.android.maxclub.firenotes.core.utils.formatDate
 import com.android.maxclub.firenotes.feature.notes.domain.models.NoteWithItemsCount
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,18 +55,18 @@ fun NoteComponent(
                 Text(
                     text = note.title,
                     style = MaterialTheme.typography.titleLarge,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
 
+                val itemsSubtitle = pluralStringResource(
+                    id = R.plurals.item_plural,
+                    count = note.itemsCount,
+                    note.itemsCount,
+                )
+                val timestampSubtitle = formatDate(date = Date(note.timestamp))
                 Text(
-                    text = pluralStringResource(
-                        id = R.plurals.item_plural,
-                        count = note.itemsCount,
-                        note.itemsCount,
-                    ),
+                    text = "$itemsSubtitle | $timestampSubtitle",
                     style = MaterialTheme.typography.bodySmall,
                 )
             }

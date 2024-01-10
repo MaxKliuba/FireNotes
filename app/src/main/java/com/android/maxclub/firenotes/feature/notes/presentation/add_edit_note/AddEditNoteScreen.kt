@@ -10,14 +10,17 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.maxclub.firenotes.R
 import com.android.maxclub.firenotes.feature.notes.presentation.add_edit_note.components.NoteItemList
 import com.android.maxclub.firenotes.feature.notes.presentation.add_edit_note.components.AddEditNoteTopAppBar
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun AddEditNoteScreen(
@@ -25,15 +28,27 @@ fun AddEditNoteScreen(
     onDeleteNote: (String) -> Unit,
     viewModel: AddEditNoteViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
     val state by viewModel.uiState
+
+    LaunchedEffect(key1 = true) {
+        viewModel.uiAction.collectLatest { action ->
+            when (action) {
+                is AddEditNoteUiAction.LaunchShareNoteIntent -> {
+                    context.startActivity(action.intent)
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
             AddEditNoteTopAppBar(
-                noteId = state.note?.id,
-                noteTitle = state.note?.title,
-                onNoteTitleChange = viewModel::updateNoteTitle,
+                note = state.note,
+                onNoteTitleChange = viewModel::tryUpdateNoteTitle,
                 onNavigateUp = onNavigateUp,
+                onShareNote = viewModel::shareNote,
                 onDeleteNote = { noteId ->
                     onDeleteNote(noteId)
                     onNavigateUp()

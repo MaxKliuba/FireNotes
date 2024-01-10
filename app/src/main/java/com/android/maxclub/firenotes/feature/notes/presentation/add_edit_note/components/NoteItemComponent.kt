@@ -14,11 +14,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -33,11 +36,19 @@ fun NoteItemComponent(
     onDelete: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val focusRequester = remember { FocusRequester() }
+
     var checked by remember {
         mutableStateOf(noteItem.checked)
     }
     var contentValue by remember {
         mutableStateOf(TextFieldValue(noteItem.content))
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        if (noteItem.content.isEmpty()) {
+            focusRequester.requestFocus()
+        }
     }
 
     Row(modifier = modifier.background(color = MaterialTheme.colorScheme.surface)) {
@@ -68,6 +79,7 @@ fun NoteItemComponent(
                 .padding(vertical = 12.dp, horizontal = 4.dp)
                 .heightIn(min = 24.dp)
                 .weight(1f)
+                .focusRequester(focusRequester)
         )
 
         IconButton(
