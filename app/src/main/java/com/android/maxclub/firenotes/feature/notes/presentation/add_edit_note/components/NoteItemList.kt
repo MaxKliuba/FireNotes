@@ -11,6 +11,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import com.android.maxclub.firenotes.feature.notes.domain.models.NoteItem
+import com.android.maxclub.firenotes.feature.notes.domain.models.NoteItemType
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
@@ -24,6 +25,7 @@ fun NoteItemList(
     onNoteItemContentChange: (noteItemId: String, content: String) -> Unit,
     onReorderLocalNoteItems: (fromIndex: Int, toIndex: Int) -> Unit,
     onApplyNoteItemsReorder: () -> Unit,
+    onAddNoteItem: (NoteItemType) -> Unit,
     onDeleteNoteItem: (noteItemId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -58,13 +60,23 @@ fun NoteItemList(
                     }
                 }
 
-                NoteItemComponent(
-                    noteItem = noteItem,
-                    onCheckedChange = onNoteItemCheckedChange,
-                    onContentChange = onNoteItemContentChange,
-                    onDelete = onDeleteNoteItem,
-                    modifier = Modifier.animateItemPlacement()
-                )
+                when (noteItem) {
+                    is NoteItem.Text -> NoteItemTextComponent(
+                        noteItem = noteItem,
+                        onContentChange = onNoteItemContentChange,
+                        onDelete = onDeleteNoteItem,
+                        modifier = Modifier.animateItemPlacement()
+                    )
+
+                    is NoteItem.ToDo -> NoteItemToDoComponent(
+                        noteItem = noteItem,
+                        onCheckedChange = onNoteItemCheckedChange,
+                        onContentChange = onNoteItemContentChange,
+                        onAddToDoItem = { onAddNoteItem(NoteItemType.TODO) },
+                        onDelete = onDeleteNoteItem,
+                        modifier = Modifier.animateItemPlacement()
+                    )
+                }
             }
         }
     }

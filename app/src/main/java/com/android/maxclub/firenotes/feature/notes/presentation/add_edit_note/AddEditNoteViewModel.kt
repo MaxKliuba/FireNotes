@@ -12,6 +12,7 @@ import com.android.maxclub.firenotes.core.utils.update
 import com.android.maxclub.firenotes.feature.main.presentation.Screen
 import com.android.maxclub.firenotes.feature.notes.domain.models.Note
 import com.android.maxclub.firenotes.feature.notes.domain.models.NoteItem
+import com.android.maxclub.firenotes.feature.notes.domain.models.NoteItemType
 import com.android.maxclub.firenotes.feature.notes.domain.repositories.NoteRepository
 import com.android.maxclub.firenotes.feature.notes.domain.usecases.GetNoteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,6 +41,7 @@ class AddEditNoteViewModel @Inject constructor(
     private val _uiState = mutableStateOf(
         AddEditNoteUiState(
             isLoading = true,
+            isFabOpen = false,
             note = null,
         )
     )
@@ -71,16 +73,30 @@ class AddEditNoteViewModel @Inject constructor(
         return true
     }
 
-    fun addNoteItem() {
+    fun setFabState(isOpen: Boolean) {
+        _uiState.update { it.copy(isFabOpen = isOpen) }
+    }
+
+    fun addNoteItem(type: NoteItemType) {
         _uiState.value.note?.let { note ->
             viewModelScope.launch {
-                val noteItem = NoteItem(
-                    checked = false,
-                    content = "",
-                    position = Date().time,
-                )
+                val noteItem = when (type) {
+                    NoteItemType.TEXT -> NoteItem.Text(
+                        content = "",
+                        position = Date().time,
+                    )
+
+                    NoteItemType.TODO -> NoteItem.ToDo(
+                        checked = false,
+                        content = "",
+                        position = Date().time,
+                    )
+                }
+
                 noteRepository.addNoteItem(note.id, noteItem)
             }
+
+            setFabState(false)
         }
     }
 
@@ -149,16 +165,10 @@ class AddEditNoteViewModel @Inject constructor(
     }
 
     fun shareNote(note: Note) {
-        val text = "${note.title}${
-            note.items.joinToString(prefix = "\n\n", separator = "\n") { noteItem ->
-                "${if (noteItem.checked) "[*]" else "[_]"}\t${noteItem.content}"
-            }
-        }"
-
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_SUBJECT, note.title)
-            putExtra(Intent.EXTRA_TEXT, text)
+            putExtra(Intent.EXTRA_TEXT, note.toContentString())
         }
         val chooserIntent = Intent.createChooser(intent, null)
 

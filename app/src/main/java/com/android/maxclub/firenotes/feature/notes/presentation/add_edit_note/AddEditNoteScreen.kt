@@ -3,11 +3,7 @@ package com.android.maxclub.firenotes.feature.notes.presentation.add_edit_note
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -20,11 +16,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.maxclub.firenotes.R
-import com.android.maxclub.firenotes.feature.notes.presentation.add_edit_note.components.NoteItemList
 import com.android.maxclub.firenotes.feature.notes.presentation.add_edit_note.components.AddEditNoteTopAppBar
+import com.android.maxclub.firenotes.feature.notes.presentation.add_edit_note.components.AddNoteItemFab
+import com.android.maxclub.firenotes.feature.notes.presentation.add_edit_note.components.NoteItemList
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -76,12 +72,11 @@ fun AddEditNoteScreen(
         },
         floatingActionButton = {
             state.note?.let {
-                FloatingActionButton(onClick = viewModel::addNoteItem) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.add_item_button),
-                    )
-                }
+                AddNoteItemFab(
+                    isOpen = state.isFabOpen,
+                    onChangeState = viewModel::setFabState,
+                    onAddNoteItem = viewModel::addNoteItem,
+                )
             }
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -104,6 +99,7 @@ fun AddEditNoteScreen(
                     onNoteItemContentChange = viewModel::updateNoteItemContent,
                     onReorderLocalNoteItems = viewModel::reorderLocalNoteItems,
                     onApplyNoteItemsReorder = viewModel::applyNoteItemsReorder,
+                    onAddNoteItem = viewModel::addNoteItem,
                     onDeleteNoteItem = viewModel::deleteNoteItem,
                     modifier = Modifier.fillMaxSize()
                 )

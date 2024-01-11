@@ -8,4 +8,7 @@ data class Note(
     val position: Long,
     @Stable val items: List<NoteItem> = emptyList(),
     val id: String = "",
-)
+) {
+    fun toContentString(): String =
+        "$title${items.joinToString(prefix = "\n\n", separator = "\n") { it.toContentString() }}"
+}

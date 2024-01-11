@@ -26,6 +26,9 @@
     <string name="note_title_placeholder">Title</string>
     <string name="share_note_button">Share note</string>
     <string name="add_item_button">Add item</string>
+    <string name="add_todo_button">Add TODO</string>
+    <string name="add_text_button">Add Text</string>
+    <string name="close_button">Close</string>
     <string name="delete_note_item_button">Delete item</string>
     <string name="note_item_deleted_message">Item deleted</string>
 </resources>
