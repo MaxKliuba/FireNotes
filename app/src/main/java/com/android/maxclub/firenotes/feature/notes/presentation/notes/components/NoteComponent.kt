@@ -59,14 +59,13 @@ fun NoteComponent(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                val itemsSubtitle = pluralStringResource(
+                val itemsCountText = pluralStringResource(
                     id = R.plurals.item_plural,
                     count = note.itemsCount,
                     note.itemsCount,
                 )
-                val timestampSubtitle = formatDate(date = Date(note.timestamp))
                 Text(
-                    text = "$itemsSubtitle | $timestampSubtitle",
+                    text = "$itemsCountText   |   ${formatDate(Date(note.timestamp))}",
                     style = MaterialTheme.typography.bodySmall,
                 )
             }

@@ -70,10 +70,10 @@ fun NotesScreen(
 
             NoteList(
                 notes = state.notes,
-                onLocalNotesReorder = viewModel::reorderLocalNotes,
+                onReorderLocalNotes = viewModel::reorderLocalNotes,
                 onApplyNotesReorder = viewModel::applyNotesReorder,
-                onNoteEdit = onEditNote,
-                onNoteDelete = onDeleteNote,
+                onEditNote = onEditNote,
+                onDeleteNote = onDeleteNote,
                 modifier = Modifier.fillMaxSize()
             )
         }

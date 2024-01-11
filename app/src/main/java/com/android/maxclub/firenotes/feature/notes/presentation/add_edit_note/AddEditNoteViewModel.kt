@@ -59,6 +59,7 @@ class AddEditNoteViewModel @Inject constructor(
         }
 
     init {
+        permanentlyDeleteMarkedNoteItems(initNoteId)
         getNote(initNoteId)
     }
 
@@ -133,7 +134,16 @@ class AddEditNoteViewModel @Inject constructor(
     fun deleteNoteItem(noteItemId: String) {
         _uiState.value.note?.let { note ->
             viewModelScope.launch {
-                noteRepository.deletePermanentlyNoteItem(note.id, noteItemId)
+                noteRepository.deleteNoteItemById(note.id, noteItemId)
+                uiActionChannel.send(AddEditNoteUiAction.ShowNoteItemDeletedMessage(noteItemId))
+            }
+        }
+    }
+
+    fun tryRestoreNoteItem(noteItemId: String) {
+        _uiState.value.note?.let { note ->
+            viewModelScope.launch {
+                noteRepository.tryRestoreNoteItemById(note.id, noteItemId)
             }
         }
     }
@@ -156,6 +166,14 @@ class AddEditNoteViewModel @Inject constructor(
             AddEditNoteUiAction.LaunchShareNoteIntent(chooserIntent),
             viewModelScope,
         )
+    }
+
+    private fun permanentlyDeleteMarkedNoteItems(noteId: String) {
+        if (noteId != Screen.AddEditNote.DEFAULT_NOTE_ID) {
+            viewModelScope.launch {
+                noteRepository.permanentlyDeleteMarkedNoteItems(noteId)
+            }
+        }
     }
 
     private fun getNote(noteId: String) {

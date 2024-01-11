@@ -22,15 +22,15 @@ fun NoteItemList(
     noteItems: List<NoteItem>,
     onNoteItemCheckedChange: (noteItemId: String, isChecked: Boolean) -> Unit,
     onNoteItemContentChange: (noteItemId: String, content: String) -> Unit,
-    onLocalNoteItemsReorder: (fromIndex: Int, toIndex: Int) -> Unit,
+    onReorderLocalNoteItems: (fromIndex: Int, toIndex: Int) -> Unit,
     onApplyNoteItemsReorder: () -> Unit,
-    onNoteItemDelete: (noteItemId: String) -> Unit,
+    onDeleteNoteItem: (noteItemId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
     val state = rememberReorderableLazyListState(
         onMove = { from, to ->
-            onLocalNoteItemsReorder(from.index, to.index)
+            onReorderLocalNoteItems(from.index, to.index)
         },
         onDragEnd = { _, _ ->
             onApplyNoteItemsReorder()
@@ -62,7 +62,7 @@ fun NoteItemList(
                     noteItem = noteItem,
                     onCheckedChange = onNoteItemCheckedChange,
                     onContentChange = onNoteItemContentChange,
-                    onDelete = onNoteItemDelete,
+                    onDelete = onDeleteNoteItem,
                     modifier = Modifier.animateItemPlacement()
                 )
             }

@@ -18,16 +18,16 @@ import org.burnoutcrew.reorderable.reorderable
 @Composable
 fun NoteList(
     notes: List<NoteWithItemsCount>,
-    onLocalNotesReorder: (fromIndex: Int, toIndex: Int) -> Unit,
+    onReorderLocalNotes: (fromIndex: Int, toIndex: Int) -> Unit,
     onApplyNotesReorder: () -> Unit,
-    onNoteEdit: (noteId: String) -> Unit,
-    onNoteDelete: (noteId: String) -> Unit,
+    onEditNote: (noteId: String) -> Unit,
+    onDeleteNote: (noteId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
     val state = rememberReorderableLazyListState(
         onMove = { from, to ->
-            onLocalNotesReorder(from.index, to.index)
+            onReorderLocalNotes(from.index, to.index)
         },
         onDragEnd = { _, _ ->
             onApplyNotesReorder()
@@ -58,8 +58,8 @@ fun NoteList(
                 NoteComponent(
                     note = note,
                     isDragging = isDragging,
-                    onEdit = onNoteEdit,
-                    onDelete = onNoteDelete,
+                    onEdit = onEditNote,
+                    onDelete = onDeleteNote,
                 )
             }
         }

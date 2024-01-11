@@ -19,7 +19,5 @@ fun formatDate(
     val pattern = context.getString(R.string.pattern)
     val locale = Locale(context.getString(R.string.language), context.getString(R.string.country))
 
-    return SimpleDateFormat(pattern, locale)
-        .format(date)
-        .replaceFirstChar { it.uppercaseChar() }
+    return SimpleDateFormat(pattern, locale).format(date)
 }

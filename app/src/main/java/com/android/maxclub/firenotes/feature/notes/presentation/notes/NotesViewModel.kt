@@ -31,6 +31,7 @@ class NotesViewModel @Inject constructor(
     val uiState: State<NotesUiState> = _uiState
 
     init {
+        permanentlyDeleteMarkedNotes()
         getNotes()
     }
 
@@ -66,6 +67,12 @@ class NotesViewModel @Inject constructor(
     fun applyNotesReorder() {
         viewModelScope.launch {
             noteRepository.updateAllNotesPositions(*_uiState.value.notes.toTypedArray())
+        }
+    }
+
+    private fun permanentlyDeleteMarkedNotes() {
+        viewModelScope.launch {
+            noteRepository.permanentlyDeleteMarkedNotes()
         }
     }
 

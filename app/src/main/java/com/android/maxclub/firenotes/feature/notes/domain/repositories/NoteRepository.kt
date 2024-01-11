@@ -22,9 +22,9 @@ interface NoteRepository {
 
     suspend fun deleteNoteById(noteId: String)
 
-    suspend fun deletePermanentlyNote(noteId: String)
-
     suspend fun tryRestoreNoteById(noteId: String)
+
+    suspend fun permanentlyDeleteMarkedNotes()
 
     /*
      * NoteItem
@@ -39,7 +39,7 @@ interface NoteRepository {
 
     suspend fun deleteNoteItemById(noteId: String, noteItemId: String)
 
-    suspend fun deletePermanentlyNoteItem(noteId: String, noteItemId: String)
-
     suspend fun tryRestoreNoteItemById(noteId: String, noteItemId: String)
+
+    suspend fun permanentlyDeleteMarkedNoteItems(noteId: String)
 }

@@ -9,9 +9,14 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,6 +34,7 @@ fun AddEditNoteScreen(
     viewModel: AddEditNoteViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val state by viewModel.uiState
 
@@ -37,6 +43,19 @@ fun AddEditNoteScreen(
             when (action) {
                 is AddEditNoteUiAction.LaunchShareNoteIntent -> {
                     context.startActivity(action.intent)
+                }
+
+                is AddEditNoteUiAction.ShowNoteItemDeletedMessage -> {
+                    snackbarHostState.showSnackbar(
+                        message = context.getString(R.string.note_item_deleted_message),
+                        actionLabel = context.getString(R.string.undo_button),
+                        withDismissAction = true,
+                        duration = SnackbarDuration.Short,
+                    ).let { result ->
+                        if (result == SnackbarResult.ActionPerformed) {
+                            viewModel.tryRestoreNoteItem(action.noteItemId)
+                        }
+                    }
                 }
             }
         }
@@ -64,7 +83,8 @@ fun AddEditNoteScreen(
                     )
                 }
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -82,9 +102,9 @@ fun AddEditNoteScreen(
                     noteItems = note.items,
                     onNoteItemCheckedChange = viewModel::updateNoteItemChecked,
                     onNoteItemContentChange = viewModel::updateNoteItemContent,
-                    onLocalNoteItemsReorder = viewModel::reorderLocalNoteItems,
+                    onReorderLocalNoteItems = viewModel::reorderLocalNoteItems,
                     onApplyNoteItemsReorder = viewModel::applyNoteItemsReorder,
-                    onNoteItemDelete = viewModel::deleteNoteItem,
+                    onDeleteNoteItem = viewModel::deleteNoteItem,
                     modifier = Modifier.fillMaxSize()
                 )
             }

@@ -19,6 +19,7 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.combine
@@ -100,6 +101,7 @@ class NoteRepositoryImpl @Inject constructor(
 
     override suspend fun updateNoteTitle(noteId: String, title: String) {
         val documentRef = firestore.collection(collectionPath).document(noteId)
+
         firestore.batch()
             .update(documentRef, TITLE_FIELD, title)
             .withNoteTimestampUpdate(noteId)
@@ -124,11 +126,28 @@ class NoteRepositoryImpl @Inject constructor(
             .await()
     }
 
-    override suspend fun deletePermanentlyNote(noteId: String) {
-        firestore.collection(collectionPath)
-            .document(noteId)
-            .delete()
-            .await()
+    override suspend fun permanentlyDeleteMarkedNotes() {
+        coroutineScope {
+            firestore.collection(collectionPath)
+                .whereEqualTo(DELETED_FIELD, true)
+                .get()
+                .await()
+                .documents
+                .map { document ->
+                    async {
+                        document.reference.collection((ITEMS_COLLECTION_NAME))
+                            .get()
+                            .await()
+                            .documents
+                            .forEach { collectionDocument ->
+                                firestore.runTransaction { transition ->
+                                    transition.delete(collectionDocument.reference)
+                                    transition.delete(document.reference)
+                                }.await()
+                            }
+                    }
+                }.awaitAll()
+        }
     }
 
     override suspend fun tryRestoreNoteById(noteId: String) {
@@ -162,6 +181,7 @@ class NoteRepositoryImpl @Inject constructor(
             .document(noteId)
             .collection(ITEMS_COLLECTION_NAME)
             .document(noteItemId)
+
         firestore.batch()
             .update(documentRef, CHECKED_FIELD, checked)
             .withNoteTimestampUpdate(noteId)
@@ -177,6 +197,7 @@ class NoteRepositoryImpl @Inject constructor(
             .document(noteId)
             .collection(ITEMS_COLLECTION_NAME)
             .document(noteItemId)
+
         firestore.batch()
             .update(documentRef, CONTENT_FIELD, content)
             .withNoteTimestampUpdate(noteId)
@@ -203,21 +224,28 @@ class NoteRepositoryImpl @Inject constructor(
             .document(noteId)
             .collection(ITEMS_COLLECTION_NAME)
             .document(noteItemId)
+
         firestore.batch()
             .update(documentRef, DELETED_FIELD, true)
             .withNoteTimestampUpdate(noteId)
             .commit().await()
     }
 
-    override suspend fun deletePermanentlyNoteItem(noteId: String, noteItemId: String) {
-        val documentRef = firestore.collection(collectionPath)
+    override suspend fun permanentlyDeleteMarkedNoteItems(noteId: String) {
+        val batch = firestore.batch()
+
+        firestore.collection(collectionPath)
             .document(noteId)
             .collection(ITEMS_COLLECTION_NAME)
-            .document(noteItemId)
-        firestore.batch()
-            .delete(documentRef)
-            .withNoteTimestampUpdate(noteId)
-            .commit().await()
+            .whereEqualTo(DELETED_FIELD, true)
+            .get()
+            .await()
+            .documents
+            .forEach { document ->
+                batch.delete(document.reference)
+            }
+
+        batch.commit().await()
     }
 
     override suspend fun tryRestoreNoteItemById(noteId: String, noteItemId: String) {
@@ -225,6 +253,7 @@ class NoteRepositoryImpl @Inject constructor(
             .document(noteId)
             .collection(ITEMS_COLLECTION_NAME)
             .document(noteItemId)
+
         firestore.batch()
             .update(documentRef, DELETED_FIELD, false)
             .withNoteTimestampUpdate(noteId)

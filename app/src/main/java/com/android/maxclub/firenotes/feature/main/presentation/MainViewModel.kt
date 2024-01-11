@@ -74,7 +74,14 @@ class MainViewModel @Inject constructor(
 
     fun deleteNote(noteId: String) {
         viewModelScope.launch {
-            noteRepository.deletePermanentlyNote(noteId)
+            noteRepository.deleteNoteById(noteId)
+            uiActionChannel.send(MainUiAction.ShowNoteDeletedMessage(noteId))
+        }
+    }
+
+    fun tryRestoreNote(noteId: String) {
+        viewModelScope.launch {
+            noteRepository.tryRestoreNoteById(noteId)
         }
     }
 }
