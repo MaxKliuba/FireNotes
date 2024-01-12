@@ -6,7 +6,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -89,7 +91,19 @@ fun MainScreenContainer(viewModel: MainViewModel = hiltViewModel()) {
         }
     }
 
-    Scaffold(snackbarHost = { SnackbarHost(hostState = snackbarHostState) }) { paddingValues ->
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    actionColor = MaterialTheme.colorScheme.primary,
+                    dismissActionContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    snackbarData = data,
+                )
+            }
+        }
+    ) { paddingValues ->
         NavHost(
             navController = navController,
             startDestination = startDestination,
