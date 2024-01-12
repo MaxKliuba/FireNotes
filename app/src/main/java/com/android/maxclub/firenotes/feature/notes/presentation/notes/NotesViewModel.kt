@@ -5,13 +5,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.maxclub.firenotes.core.utils.update
+import com.android.maxclub.firenotes.feature.notes.domain.exceptions.NoteRepoException
 import com.android.maxclub.firenotes.feature.notes.domain.repositories.NoteRepository
 import com.android.maxclub.firenotes.feature.notes.domain.usecases.GetNotesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,6 +32,9 @@ class NotesViewModel @Inject constructor(
         )
     )
     val uiState: State<NotesUiState> = _uiState
+
+    private val uiActionChannel = Channel<NotesUiAction>()
+    val uiAction = uiActionChannel.receiveAsFlow()
 
     init {
         permanentlyDeleteMarkedNotes()
@@ -66,13 +72,23 @@ class NotesViewModel @Inject constructor(
 
     fun applyNotesReorder() {
         viewModelScope.launch {
-            noteRepository.updateAllNotesPositions(*_uiState.value.notes.toTypedArray())
+            try {
+                noteRepository.updateAllNotesPositions(*_uiState.value.notes.toTypedArray())
+            } catch (e: NoteRepoException) {
+                e.printStackTrace()
+                uiActionChannel.send(NotesUiAction.ShowNotesErrorMessage(e.message.toString()))
+            }
         }
     }
 
     private fun permanentlyDeleteMarkedNotes() {
         viewModelScope.launch {
-            noteRepository.permanentlyDeleteMarkedNotes()
+            try {
+                noteRepository.permanentlyDeleteMarkedNotes()
+            } catch (e: NoteRepoException) {
+                e.printStackTrace()
+                uiActionChannel.send(NotesUiAction.ShowNotesErrorMessage(e.message.toString()))
+            }
         }
     }
 
@@ -89,8 +105,9 @@ class NotesViewModel @Inject constructor(
                     )
                 }
             }
-            .catch {
-                it.printStackTrace()
+            .catch {e ->
+                e.printStackTrace()
+                uiActionChannel.send(NotesUiAction.ShowNotesErrorMessage(e.message.toString()))
             }
             .launchIn(viewModelScope)
     }

@@ -65,11 +65,7 @@ class GoogleAuthClient @Inject constructor(
             signInClient.beginSignIn(signInRequest).await()
                 ?.pendingIntent?.intentSender
         } catch (e: Exception) {
-            if (e is CancellationException) {
-                throw e
-            } else {
-                throw SignInException(e.localizedMessage ?: "Sign-In failed")
-            }
+            throw if (e is CancellationException) e else SignInException(e.localizedMessage)
         }
 
     @Throws(SignInException::class)
@@ -81,11 +77,7 @@ class GoogleAuthClient @Inject constructor(
         try {
             auth.signInWithCredential(googleCredentials).await()
         } catch (e: Exception) {
-            if (e is CancellationException) {
-                throw e
-            } else {
-                throw SignInException(e.localizedMessage ?: "Sign-In failed")
-            }
+            throw if (e is CancellationException) e else SignInException(e.localizedMessage)
         }
     }
 
@@ -95,11 +87,7 @@ class GoogleAuthClient @Inject constructor(
             signInClient.signOut().await()
             auth.signOut()
         } catch (e: Exception) {
-            if (e is CancellationException) {
-                throw e
-            } else {
-                throw SignOutException(e.localizedMessage ?: "Sign-Out failed")
-            }
+            throw if (e is CancellationException) e else SignOutException(e.localizedMessage)
         }
     }
 }

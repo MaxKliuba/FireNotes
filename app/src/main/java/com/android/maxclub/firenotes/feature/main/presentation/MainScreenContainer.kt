@@ -81,6 +81,10 @@ fun MainScreenContainer(viewModel: MainViewModel = hiltViewModel()) {
                         }
                     }
                 }
+
+                is MainUiAction.ShowNotesErrorMessage -> {
+                    Toast.makeText(context, action.errorMessage, Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

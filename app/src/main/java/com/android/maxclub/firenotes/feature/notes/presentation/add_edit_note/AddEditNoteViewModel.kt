@@ -10,6 +10,7 @@ import com.android.maxclub.firenotes.core.utils.debounce
 import com.android.maxclub.firenotes.core.utils.sendIn
 import com.android.maxclub.firenotes.core.utils.update
 import com.android.maxclub.firenotes.feature.main.presentation.Screen
+import com.android.maxclub.firenotes.feature.notes.domain.exceptions.NoteRepoException
 import com.android.maxclub.firenotes.feature.notes.domain.models.Note
 import com.android.maxclub.firenotes.feature.notes.domain.models.NoteItem
 import com.android.maxclub.firenotes.feature.notes.domain.models.NoteItemType
@@ -68,7 +69,15 @@ class AddEditNoteViewModel @Inject constructor(
     fun tryUpdateNoteTitle(noteId: String, title: String): Boolean {
         if (title.length > MAX_TITLE_LENGTH) return false
 
-        onUpdateNoteTitleWithDebounce(noteId, title)
+        try {
+            onUpdateNoteTitleWithDebounce(noteId, title)
+        } catch (e: NoteRepoException) {
+            e.printStackTrace()
+            uiActionChannel.sendIn(
+                AddEditNoteUiAction.ShowNoteErrorMessage(e.message.toString()),
+                viewModelScope
+            )
+        }
 
         return true
     }
@@ -93,25 +102,52 @@ class AddEditNoteViewModel @Inject constructor(
                     )
                 }
 
-                noteRepository.addNoteItem(note.id, noteItem)
+                try {
+                    noteRepository.addNoteItem(note.id, noteItem)
+                } catch (e: NoteRepoException) {
+                    e.printStackTrace()
+                    uiActionChannel.send(AddEditNoteUiAction.ShowNoteErrorMessage(e.message.toString()))
+                }
             }
 
             setFabState(false)
-        }
+        } ?: uiActionChannel.sendIn(
+            AddEditNoteUiAction.ShowNoteErrorMessage("Note not found"),
+            viewModelScope
+        )
     }
 
     fun updateNoteItemChecked(noteItemId: String, isChecked: Boolean) {
         _uiState.value.note?.let { note ->
             viewModelScope.launch {
-                noteRepository.updateNoteItemChecked(note.id, noteItemId, isChecked)
+                try {
+                    noteRepository.updateNoteItemChecked(note.id, noteItemId, isChecked)
+                } catch (e: NoteRepoException) {
+                    e.printStackTrace()
+                    uiActionChannel.send(AddEditNoteUiAction.ShowNoteErrorMessage(e.message.toString()))
+                }
             }
-        }
+        } ?: uiActionChannel.sendIn(
+            AddEditNoteUiAction.ShowNoteErrorMessage("Note not found"),
+            viewModelScope
+        )
     }
 
     fun updateNoteItemContent(noteItemId: String, content: String) {
         _uiState.value.note?.let { note ->
-            onUpdateNoteItemContentWithDebounce(note.id, noteItemId, content)
-        }
+            try {
+                onUpdateNoteItemContentWithDebounce(note.id, noteItemId, content)
+            } catch (e: NoteRepoException) {
+                e.printStackTrace()
+                uiActionChannel.sendIn(
+                    AddEditNoteUiAction.ShowNoteErrorMessage(e.message.toString()),
+                    viewModelScope
+                )
+            }
+        } ?: uiActionChannel.sendIn(
+            AddEditNoteUiAction.ShowNoteErrorMessage("Note not found"),
+            viewModelScope
+        )
     }
 
     fun reorderLocalNoteItems(fromIndex: Int, toIndex: Int) {
@@ -136,32 +172,59 @@ class AddEditNoteViewModel @Inject constructor(
             } catch (e: Exception) {
                 e.printStackTrace()
             }
-        }
+        } ?: uiActionChannel.sendIn(
+            AddEditNoteUiAction.ShowNoteErrorMessage("Note not found"),
+            viewModelScope
+        )
     }
 
     fun applyNoteItemsReorder() {
         _uiState.value.note?.let { note ->
             viewModelScope.launch {
-                noteRepository.updateAllNoteItemsPositions(note.id, *note.items.toTypedArray())
+                try {
+                    noteRepository.updateAllNoteItemsPositions(note.id, *note.items.toTypedArray())
+                } catch (e: NoteRepoException) {
+                    e.printStackTrace()
+                    uiActionChannel.send(AddEditNoteUiAction.ShowNoteErrorMessage(e.message.toString()))
+                }
             }
-        }
+        } ?: uiActionChannel.sendIn(
+            AddEditNoteUiAction.ShowNoteErrorMessage("Note not found"),
+            viewModelScope
+        )
     }
 
     fun deleteNoteItem(noteItemId: String) {
         _uiState.value.note?.let { note ->
             viewModelScope.launch {
-                noteRepository.deleteNoteItemById(note.id, noteItemId)
-                uiActionChannel.send(AddEditNoteUiAction.ShowNoteItemDeletedMessage(noteItemId))
+                try {
+                    noteRepository.deleteNoteItemById(note.id, noteItemId)
+                    uiActionChannel.send(AddEditNoteUiAction.ShowNoteItemDeletedMessage(noteItemId))
+                } catch (e: NoteRepoException) {
+                    e.printStackTrace()
+                    uiActionChannel.send(AddEditNoteUiAction.ShowNoteErrorMessage(e.message.toString()))
+                }
             }
-        }
+        } ?: uiActionChannel.sendIn(
+            AddEditNoteUiAction.ShowNoteErrorMessage("Note not found"),
+            viewModelScope
+        )
     }
 
     fun tryRestoreNoteItem(noteItemId: String) {
         _uiState.value.note?.let { note ->
             viewModelScope.launch {
-                noteRepository.tryRestoreNoteItemById(note.id, noteItemId)
+                try {
+                    noteRepository.tryRestoreNoteItemById(note.id, noteItemId)
+                } catch (e: NoteRepoException) {
+                    e.printStackTrace()
+                    uiActionChannel.send(AddEditNoteUiAction.ShowNoteErrorMessage(e.message.toString()))
+                }
             }
-        }
+        } ?: uiActionChannel.sendIn(
+            AddEditNoteUiAction.ShowNoteErrorMessage("Note not found"),
+            viewModelScope
+        )
     }
 
     fun shareNote(note: Note) {
@@ -181,13 +244,17 @@ class AddEditNoteViewModel @Inject constructor(
     private fun permanentlyDeleteMarkedNoteItems(noteId: String) {
         if (noteId != Screen.AddEditNote.DEFAULT_NOTE_ID) {
             viewModelScope.launch {
-                noteRepository.permanentlyDeleteMarkedNoteItems(noteId)
+                try {
+                    noteRepository.permanentlyDeleteMarkedNoteItems(noteId)
+                } catch (e: NoteRepoException) {
+                    e.printStackTrace()
+                    uiActionChannel.send(AddEditNoteUiAction.ShowNoteErrorMessage(e.message.toString()))
+                }
             }
         }
     }
 
     private fun getNote(noteId: String) {
-        println(noteId)
         viewModelScope.launch {
             val newNoteId = if (noteId == Screen.AddEditNote.DEFAULT_NOTE_ID) {
                 val note = Note(
@@ -195,27 +262,36 @@ class AddEditNoteViewModel @Inject constructor(
                     timestamp = Date().time,
                     position = Date().time,
                 )
-                noteRepository.addNote(note)
+                try {
+                    noteRepository.addNote(note)
+                } catch (e: NoteRepoException) {
+                    e.printStackTrace()
+                    uiActionChannel.send(AddEditNoteUiAction.ShowNoteErrorMessage(e.message.toString()))
+                    null
+                }
             } else {
                 noteId
             }
 
-            getNoteUseCase(newNoteId)
-                .onStart {
-                    _uiState.update { it.copy(isLoading = true) }
-                }
-                .onEach { note ->
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            note = note,
-                        )
+            newNoteId?.let {
+                getNoteUseCase(newNoteId)
+                    .onStart {
+                        _uiState.update { it.copy(isLoading = true) }
                     }
-                }
-                .catch {
-                    it.printStackTrace()
-                }
-                .launchIn(this)
+                    .onEach { note ->
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                note = note,
+                            )
+                        }
+                    }
+                    .catch { e ->
+                        e.printStackTrace()
+                        uiActionChannel.send(AddEditNoteUiAction.ShowNoteErrorMessage(e.message.toString()))
+                    }
+                    .launchIn(this)
+            }
         }
     }
 }

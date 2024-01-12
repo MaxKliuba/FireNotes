@@ -1,5 +1,6 @@
 package com.android.maxclub.firenotes.feature.notes.presentation.notes
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -10,9 +11,11 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.maxclub.firenotes.R
@@ -20,6 +23,7 @@ import com.android.maxclub.firenotes.feature.auth.domain.models.User
 import com.android.maxclub.firenotes.feature.notes.presentation.notes.components.NoteList
 import com.android.maxclub.firenotes.feature.notes.presentation.notes.components.NotesTopAppBar
 import com.android.maxclub.firenotes.feature.notes.presentation.notes.components.UserProfileDialog
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun NotesScreen(
@@ -30,7 +34,19 @@ fun NotesScreen(
     onDeleteNote: (String) -> Unit,
     viewModel: NotesViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
+
     val state by viewModel.uiState
+
+    LaunchedEffect(key1 = true) {
+        viewModel.uiAction.collectLatest { action ->
+            when (action) {
+                is NotesUiAction.ShowNotesErrorMessage -> {
+                    Toast.makeText(context, action.errorMessage, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     if (state.isUserProfileDialogVisible) {
         UserProfileDialog(

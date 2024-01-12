@@ -8,6 +8,7 @@ import com.android.maxclub.firenotes.feature.notes.data.mappers.toNoteDto
 import com.android.maxclub.firenotes.feature.notes.data.mappers.toNoteDtoItem
 import com.android.maxclub.firenotes.feature.notes.data.mappers.toNoteItem
 import com.android.maxclub.firenotes.feature.notes.data.mappers.toNoteWithItemsCount
+import com.android.maxclub.firenotes.feature.notes.domain.exceptions.NoteRepoException
 import com.android.maxclub.firenotes.feature.notes.domain.models.Note
 import com.android.maxclub.firenotes.feature.notes.domain.models.NoteItem
 import com.android.maxclub.firenotes.feature.notes.domain.models.NoteWithItemsCount
@@ -16,6 +17,7 @@ import com.google.firebase.firestore.WriteBatch
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.awaitClose
@@ -48,18 +50,25 @@ class NoteRepositoryImpl @Inject constructor(
                     scope.launch {
                         val notes = documents.mapNotNull { document ->
                             async {
-                                val itemsCount =
+                                val itemsCount = try {
                                     document.reference.collection(ITEMS_COLLECTION_NAME)
                                         .get().await()
                                         .documents.mapNotNull {
                                             it.toObject<NoteItemDto>()?.toNoteItem(it.id)
                                         }.count()
+                                } catch (e: Exception) {
+                                    if (e is CancellationException) {
+                                        throw e
+                                    } else {
+                                        e.printStackTrace()
+                                        0
+                                    }
+                                }
 
                                 document.toObject<NoteDto>()
                                     ?.toNoteWithItemsCount(document.id, itemsCount)
                             }
-                        }.awaitAll()
-                            .filterNotNull()
+                        }.awaitAll().filterNotNull()
 
                         trySend(notes)
                     }
@@ -92,172 +101,237 @@ class NoteRepositoryImpl @Inject constructor(
         note.copy(items = items)
     }
 
+    @Throws(NoteRepoException::class)
     override suspend fun addNote(note: Note): String {
-        return firestore.collection(collectionPath)
-            .add(note.toNoteDto())
-            .await()
-            .id
-    }
-
-    override suspend fun updateNoteTitle(noteId: String, title: String) {
-        val documentRef = firestore.collection(collectionPath).document(noteId)
-
-        firestore.batch()
-            .update(documentRef, TITLE_FIELD, title)
-            .withNoteTimestampUpdate(noteId)
-            .commit().await()
-    }
-
-    override suspend fun updateAllNotesPositions(vararg notes: NoteWithItemsCount) {
-        val batch = firestore.batch()
-
-        notes.forEach { note ->
-            val documentRef = firestore.collection(collectionPath).document(note.id)
-            batch.update(documentRef, POSITION_FIELD, note.position)
+        return try {
+            firestore.collection(collectionPath)
+                .add(note.toNoteDto())
+                .await()
+                .id
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
         }
-
-        batch.commit().await()
     }
 
+    @Throws(NoteRepoException::class)
+    override suspend fun updateNoteTitle(noteId: String, title: String) {
+        try {
+            val documentRef = firestore.collection(collectionPath).document(noteId)
+
+            firestore.batch()
+                .update(documentRef, TITLE_FIELD, title)
+                .withNoteTimestampUpdate(noteId)
+                .commit().await()
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
+        }
+    }
+
+    @Throws(NoteRepoException::class)
+    override suspend fun updateAllNotesPositions(vararg notes: NoteWithItemsCount) {
+        try {
+            val batch = firestore.batch()
+
+            notes.forEach { note ->
+                val documentRef = firestore.collection(collectionPath).document(note.id)
+                batch.update(documentRef, POSITION_FIELD, note.position)
+            }
+
+            batch.commit().await()
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
+        }
+    }
+
+    @Throws(NoteRepoException::class)
     override suspend fun deleteNoteById(noteId: String) {
-        firestore.collection(collectionPath)
-            .document(noteId)
-            .update(DELETED_FIELD, true)
-            .await()
+        try {
+            firestore.collection(collectionPath)
+                .document(noteId)
+                .update(DELETED_FIELD, true)
+                .await()
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
+        }
     }
 
+    @Throws(NoteRepoException::class)
     override suspend fun permanentlyDeleteMarkedNotes() {
         coroutineScope {
-            firestore.collection(collectionPath)
-                .whereEqualTo(DELETED_FIELD, true)
-                .get()
-                .await()
-                .documents
-                .map { document ->
-                    async {
-                        document.reference.collection((ITEMS_COLLECTION_NAME))
-                            .get()
-                            .await()
-                            .documents
-                            .forEach { collectionDocument ->
-                                firestore.runTransaction { transition ->
-                                    transition.delete(collectionDocument.reference)
-                                    transition.delete(document.reference)
-                                }.await()
-                            }
-                    }
-                }.awaitAll()
+            try {
+                firestore.collection(collectionPath)
+                    .whereEqualTo(DELETED_FIELD, true)
+                    .get()
+                    .await()
+                    .documents
+                    .map { document ->
+                        async {
+                            document.reference.collection((ITEMS_COLLECTION_NAME))
+                                .get()
+                                .await()
+                                .documents
+                                .forEach { collectionDocument ->
+                                    firestore.runTransaction { transition ->
+                                        transition.delete(collectionDocument.reference)
+                                        transition.delete(document.reference)
+                                    }.await()
+                                }
+                        }
+                    }.awaitAll()
+            } catch (e: Exception) {
+                throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
+            }
         }
     }
 
+    @Throws(NoteRepoException::class)
     override suspend fun tryRestoreNoteById(noteId: String) {
-        firestore.collection(collectionPath)
-            .document(noteId)
-            .update(DELETED_FIELD, false)
-            .await()
+        try {
+            firestore.collection(collectionPath)
+                .document(noteId)
+                .update(DELETED_FIELD, false)
+                .await()
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
+        }
     }
 
     /*
      * NoteItem
      */
+    @Throws(NoteRepoException::class)
     override suspend fun addNoteItem(noteId: String, noteItem: NoteItem) {
-        firestore.collection(collectionPath)
-            .document(noteId)
-            .collection(ITEMS_COLLECTION_NAME)
-            .add(noteItem.toNoteDtoItem())
-            .await()
+        try {
+            firestore.collection(collectionPath)
+                .document(noteId)
+                .collection(ITEMS_COLLECTION_NAME)
+                .add(noteItem.toNoteDtoItem())
+                .await()
 
-        firestore.batch()
-            .withNoteTimestampUpdate(noteId)
-            .commit().await()
+            firestore.batch()
+                .withNoteTimestampUpdate(noteId)
+                .commit().await()
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
+        }
     }
 
+    @Throws(NoteRepoException::class)
     override suspend fun updateNoteItemChecked(
         noteId: String,
         noteItemId: String,
         checked: Boolean
     ) {
-        val documentRef = firestore.collection(collectionPath)
-            .document(noteId)
-            .collection(ITEMS_COLLECTION_NAME)
-            .document(noteItemId)
+        try {
+            val documentRef = firestore.collection(collectionPath)
+                .document(noteId)
+                .collection(ITEMS_COLLECTION_NAME)
+                .document(noteItemId)
 
-        firestore.batch()
-            .update(documentRef, CHECKED_FIELD, checked)
-            .withNoteTimestampUpdate(noteId)
-            .commit().await()
+            firestore.batch()
+                .update(documentRef, CHECKED_FIELD, checked)
+                .withNoteTimestampUpdate(noteId)
+                .commit().await()
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
+        }
     }
 
+    @Throws(NoteRepoException::class)
     override suspend fun updateNoteItemContent(
         noteId: String,
         noteItemId: String,
         content: String
     ) {
-        val documentRef = firestore.collection(collectionPath)
-            .document(noteId)
-            .collection(ITEMS_COLLECTION_NAME)
-            .document(noteItemId)
-
-        firestore.batch()
-            .update(documentRef, CONTENT_FIELD, content)
-            .withNoteTimestampUpdate(noteId)
-            .commit().await()
-    }
-
-    override suspend fun updateAllNoteItemsPositions(noteId: String, vararg noteItems: NoteItem) {
-        val batch = firestore.batch()
-
-        noteItems.forEach { noteItem ->
+        try {
             val documentRef = firestore.collection(collectionPath)
                 .document(noteId)
                 .collection(ITEMS_COLLECTION_NAME)
-                .document(noteItem.id)
-            batch.update(documentRef, POSITION_FIELD, noteItem.position)
+                .document(noteItemId)
+
+            firestore.batch()
+                .update(documentRef, CONTENT_FIELD, content)
+                .withNoteTimestampUpdate(noteId)
+                .commit().await()
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
         }
-
-        batch.withNoteTimestampUpdate(noteId)
-            .commit().await()
     }
 
-    override suspend fun deleteNoteItemById(noteId: String, noteItemId: String) {
-        val documentRef = firestore.collection(collectionPath)
-            .document(noteId)
-            .collection(ITEMS_COLLECTION_NAME)
-            .document(noteItemId)
+    @Throws(NoteRepoException::class)
+    override suspend fun updateAllNoteItemsPositions(noteId: String, vararg noteItems: NoteItem) {
+        try {
+            val batch = firestore.batch()
 
-        firestore.batch()
-            .update(documentRef, DELETED_FIELD, true)
-            .withNoteTimestampUpdate(noteId)
-            .commit().await()
-    }
-
-    override suspend fun permanentlyDeleteMarkedNoteItems(noteId: String) {
-        val batch = firestore.batch()
-
-        firestore.collection(collectionPath)
-            .document(noteId)
-            .collection(ITEMS_COLLECTION_NAME)
-            .whereEqualTo(DELETED_FIELD, true)
-            .get()
-            .await()
-            .documents
-            .forEach { document ->
-                batch.delete(document.reference)
+            noteItems.forEach { noteItem ->
+                val documentRef = firestore.collection(collectionPath)
+                    .document(noteId)
+                    .collection(ITEMS_COLLECTION_NAME)
+                    .document(noteItem.id)
+                batch.update(documentRef, POSITION_FIELD, noteItem.position)
             }
 
-        batch.commit().await()
+            batch.withNoteTimestampUpdate(noteId)
+                .commit().await()
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
+        }
     }
 
-    override suspend fun tryRestoreNoteItemById(noteId: String, noteItemId: String) {
-        val documentRef = firestore.collection(collectionPath)
-            .document(noteId)
-            .collection(ITEMS_COLLECTION_NAME)
-            .document(noteItemId)
+    @Throws(NoteRepoException::class)
+    override suspend fun deleteNoteItemById(noteId: String, noteItemId: String) {
+        try {
+            val documentRef = firestore.collection(collectionPath)
+                .document(noteId)
+                .collection(ITEMS_COLLECTION_NAME)
+                .document(noteItemId)
 
-        firestore.batch()
-            .update(documentRef, DELETED_FIELD, false)
-            .withNoteTimestampUpdate(noteId)
-            .commit().await()
+            firestore.batch()
+                .update(documentRef, DELETED_FIELD, true)
+                .withNoteTimestampUpdate(noteId)
+                .commit().await()
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
+        }
+    }
+
+    @Throws(NoteRepoException::class)
+    override suspend fun permanentlyDeleteMarkedNoteItems(noteId: String) {
+        try {
+            val batch = firestore.batch()
+
+            firestore.collection(collectionPath)
+                .document(noteId)
+                .collection(ITEMS_COLLECTION_NAME)
+                .whereEqualTo(DELETED_FIELD, true)
+                .get()
+                .await()
+                .documents
+                .forEach { document ->
+                    batch.delete(document.reference)
+                }
+
+            batch.commit().await()
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
+        }
+    }
+
+    @Throws(NoteRepoException::class)
+    override suspend fun tryRestoreNoteItemById(noteId: String, noteItemId: String) {
+        try {
+            val documentRef = firestore.collection(collectionPath)
+                .document(noteId)
+                .collection(ITEMS_COLLECTION_NAME)
+                .document(noteItemId)
+
+            firestore.batch()
+                .update(documentRef, DELETED_FIELD, false)
+                .withNoteTimestampUpdate(noteId)
+                .commit().await()
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
+        }
     }
 
     /*

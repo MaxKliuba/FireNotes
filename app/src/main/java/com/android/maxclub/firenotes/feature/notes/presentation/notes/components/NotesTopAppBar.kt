@@ -28,6 +28,15 @@ fun NotesTopAppBar(
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
+        navigationIcon = {
+            IconButton(onClick = {}) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_app_logo),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        },
         title = {
             Text(text = stringResource(id = R.string.app_name))
         },

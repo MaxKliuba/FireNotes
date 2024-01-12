@@ -1,5 +1,6 @@
 package com.android.maxclub.firenotes.feature.notes.presentation.add_edit_note
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -52,6 +53,10 @@ fun AddEditNoteScreen(
                             viewModel.tryRestoreNoteItem(action.noteItemId)
                         }
                     }
+                }
+
+                is AddEditNoteUiAction.ShowNoteErrorMessage -> {
+                    Toast.makeText(context, action.errorMessage, Toast.LENGTH_SHORT).show()
                 }
             }
         }

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.android.maxclub.firenotes.feature.auth.domain.exceptions.SignInException
 import com.android.maxclub.firenotes.feature.auth.domain.models.AuthClient
 import com.android.maxclub.firenotes.feature.auth.domain.models.User
+import com.android.maxclub.firenotes.feature.notes.domain.exceptions.NoteRepoException
 import com.android.maxclub.firenotes.feature.notes.domain.repositories.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -74,14 +75,24 @@ class MainViewModel @Inject constructor(
 
     fun deleteNote(noteId: String) {
         viewModelScope.launch {
-            noteRepository.deleteNoteById(noteId)
-            uiActionChannel.send(MainUiAction.ShowNoteDeletedMessage(noteId))
+            try {
+                noteRepository.deleteNoteById(noteId)
+                uiActionChannel.send(MainUiAction.ShowNoteDeletedMessage(noteId))
+            } catch (e: NoteRepoException) {
+                e.printStackTrace()
+                uiActionChannel.send(MainUiAction.ShowNotesErrorMessage(e.message.toString()))
+            }
         }
     }
 
     fun tryRestoreNote(noteId: String) {
         viewModelScope.launch {
-            noteRepository.tryRestoreNoteById(noteId)
+            try {
+                noteRepository.tryRestoreNoteById(noteId)
+            } catch (e: NoteRepoException) {
+                e.printStackTrace()
+                uiActionChannel.send(MainUiAction.ShowNotesErrorMessage(e.message.toString()))
+            }
         }
     }
 }
