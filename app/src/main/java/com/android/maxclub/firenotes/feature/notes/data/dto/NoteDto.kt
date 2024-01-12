@@ -1,5 +1,8 @@
 package com.android.maxclub.firenotes.feature.notes.data.dto
 
+import androidx.annotation.Keep
+
+@Keep
 data class NoteDto(
     val title: String = "",
     val timestamp: Long = 0,

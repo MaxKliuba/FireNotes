@@ -29,13 +29,14 @@ android {
             useSupportLibrary = true
         }
 
-        val webClientId: String = gradleLocalProperties(rootDir).getProperty("WEB_CLIENT_ID") ?: ""
+        val webClientId: String =
+            gradleLocalProperties(rootDir).getProperty("WEB_CLIENT_ID") ?: "null"
         buildConfigField("String", "WEB_CLIENT_ID", "\"$webClientId\"")
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
