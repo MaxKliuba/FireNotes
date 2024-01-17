@@ -14,15 +14,15 @@ plugins {
 }
 
 android {
-    namespace = "com.android.maxclub.firenotes"
+    namespace = "com.tech.maxclub.firenotes"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.android.maxclub.firenotes"
+        applicationId = "com.tech.maxclub.firenotes"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
