@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -33,6 +34,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.tech.maxclub.firenotes.BuildConfig
 import com.tech.maxclub.firenotes.R
 import com.tech.maxclub.firenotes.feature.auth.domain.models.User
 
@@ -131,10 +133,10 @@ fun UserProfileDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Image(
-                    painter = painterResource(id = R.drawable.built_with_firebase_logo),
-                    contentDescription = null,
-                    modifier = Modifier.width(100.dp)
+                Text(
+                    text = "${stringResource(id = R.string.app_name)} v${BuildConfig.VERSION_NAME}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray,
                 )
             }
         }
