@@ -72,7 +72,7 @@ fun UserProfileDialog(
                         },
                         contentDescription = stringResource(R.string.profile_button),
                         modifier = Modifier
-                            .size(88.dp)
+                            .size(86.dp)
                             .clip(CircleShape)
                             .border(
                                 width = 1.dp,
@@ -82,12 +82,11 @@ fun UserProfileDialog(
                         contentScale = ContentScale.Crop,
                     )
 
-                    Spacer(modifier = Modifier.width(20.dp))
-
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = user?.name.toString(),
                             style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(start = 20.dp)
                         )
 
                         Spacer(modifier = Modifier.height(4.dp))
@@ -99,6 +98,7 @@ fun UserProfileDialog(
                                 notesCount,
                             ),
                             style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(start = 20.dp)
                         )
 
                         TextButton(
@@ -106,7 +106,7 @@ fun UserProfileDialog(
                                 onDeleteAccount()
                                 onDismiss()
                             },
-                            modifier = modifier.align(Alignment.CenterHorizontally)
+                            modifier = Modifier.padding(start = 8.dp)
                         ) {
                             Text(
                                 text = stringResource(R.string.delete_account_button),
