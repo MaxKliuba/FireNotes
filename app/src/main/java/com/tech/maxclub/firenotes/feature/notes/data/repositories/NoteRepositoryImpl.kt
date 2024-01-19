@@ -1,6 +1,11 @@
 package com.tech.maxclub.firenotes.feature.notes.data.repositories
 
-import com.tech.maxclub.firenotes.feature.auth.domain.models.AuthClient
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.WriteBatch
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.toObject
+import com.google.firebase.ktx.Firebase
+import com.tech.maxclub.firenotes.feature.auth.domain.repositories.AuthRepository
 import com.tech.maxclub.firenotes.feature.notes.data.dto.NoteDto
 import com.tech.maxclub.firenotes.feature.notes.data.dto.NoteItemDto
 import com.tech.maxclub.firenotes.feature.notes.data.mappers.toNote
@@ -13,10 +18,6 @@ import com.tech.maxclub.firenotes.feature.notes.domain.models.Note
 import com.tech.maxclub.firenotes.feature.notes.domain.models.NoteItem
 import com.tech.maxclub.firenotes.feature.notes.domain.models.NoteWithItemsCount
 import com.tech.maxclub.firenotes.feature.notes.domain.repositories.NoteRepository
-import com.google.firebase.firestore.WriteBatch
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.toObject
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -31,12 +32,13 @@ import java.util.Date
 import javax.inject.Inject
 
 class NoteRepositoryImpl @Inject constructor(
-    private val authClient: AuthClient
+    private val authRepository: AuthRepository
 ) : NoteRepository {
 
     private val firestore = Firebase.firestore
+
     private val collectionPath: String
-        get() = "users/${authClient.currentUser.value?.id}/notes"
+        get() = "$USERS_COLLECTION_NAME/${authRepository.currentUser.value?.id}/$NOTES_COLLECTION_NAME"
 
     /*
      * Note
@@ -105,9 +107,7 @@ class NoteRepositoryImpl @Inject constructor(
     override suspend fun addNote(note: Note): String {
         return try {
             firestore.collection(collectionPath)
-                .add(note.toNoteDto())
-                .await()
-                .id
+                .add(note.toNoteDto()).await().id
         } catch (e: Exception) {
             throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
         }
@@ -157,30 +157,16 @@ class NoteRepositoryImpl @Inject constructor(
 
     @Throws(NoteRepoException::class)
     override suspend fun permanentlyDeleteMarkedNotes() {
-        coroutineScope {
-            try {
-                firestore.collection(collectionPath)
-                    .whereEqualTo(DELETED_FIELD, true)
-                    .get()
-                    .await()
-                    .documents
-                    .map { document ->
-                        async {
-                            document.reference.collection((ITEMS_COLLECTION_NAME))
-                                .get()
-                                .await()
-                                .documents
-                                .forEach { collectionDocument ->
-                                    firestore.runTransaction { transition ->
-                                        transition.delete(collectionDocument.reference)
-                                        transition.delete(document.reference)
-                                    }.await()
-                                }
-                        }
-                    }.awaitAll()
-            } catch (e: Exception) {
-                throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
-            }
+        try {
+            val notesCollection = firestore.collection(collectionPath)
+                .whereEqualTo(DELETED_FIELD, true)
+                .get()
+                .await()
+
+            permanentlyDeleteNotes(notesCollection)
+
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
         }
     }
 
@@ -268,6 +254,7 @@ class NoteRepositoryImpl @Inject constructor(
                     .document(noteId)
                     .collection(ITEMS_COLLECTION_NAME)
                     .document(noteItem.id)
+
                 batch.update(documentRef, POSITION_FIELD, noteItem.position)
             }
 
@@ -335,6 +322,20 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     /*
+     * Account
+     */
+    override suspend fun permanentlyDeleteAccount() {
+        try {
+            val notesCollection = firestore.collection(collectionPath).get().await()
+            permanentlyDeleteNotes(notesCollection)
+
+            authRepository.deleteCurrentUser()
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
+        }
+    }
+
+    /*
      * Utils
      */
 
@@ -365,8 +366,30 @@ class NoteRepositoryImpl @Inject constructor(
         return update(documentRef, TIMESTAMP_FIELD, Date().time)
     }
 
+    private suspend fun permanentlyDeleteNotes(notesCollection: QuerySnapshot) {
+        coroutineScope {
+            notesCollection.documents.map { document ->
+                async {
+                    val collection =
+                        document.reference.collection((ITEMS_COLLECTION_NAME))
+                            .get()
+                            .await()
+                            .documents
+
+                    firestore.runTransaction { transition ->
+                        collection.forEach { collectionDocument ->
+                            transition.delete(collectionDocument.reference)
+                        }
+                        transition.delete(document.reference)
+                    }.await()
+                }
+            }.awaitAll()
+        }
+    }
 
     companion object {
+        private const val USERS_COLLECTION_NAME = "users"
+        private const val NOTES_COLLECTION_NAME = "notes"
         private const val ITEMS_COLLECTION_NAME = "items"
         private const val TITLE_FIELD = "title"
         private const val TIMESTAMP_FIELD = "timestamp"

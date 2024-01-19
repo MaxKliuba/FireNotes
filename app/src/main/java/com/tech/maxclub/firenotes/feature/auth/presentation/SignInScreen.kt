@@ -20,6 +20,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,7 +33,7 @@ import com.tech.maxclub.firenotes.R
 @Composable
 fun SignInScreen(
     isSigningIn: Boolean,
-    onSignIn: () -> Unit
+    onSignIn: (Boolean) -> Unit
 ) {
     val configuration = LocalConfiguration.current
 
@@ -96,25 +97,36 @@ fun AppLogo(modifier: Modifier = Modifier) {
 @Composable
 fun SignInSection(
     isSigningIn: Boolean,
-    onSignIn: () -> Unit,
+    onSignIn: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
-        Button(
-            onClick = onSignIn,
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.align(Alignment.Center)
         ) {
-            if (isSigningIn) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 3.dp,
-                    modifier = Modifier.size(24.dp)
-                )
-            } else {
-                Icon(imageVector = Icons.Default.Login, contentDescription = null)
+            Button(onClick = { onSignIn(false) }) {
+                if (isSigningIn) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 3.dp,
+                        modifier = Modifier.size(24.dp)
+                    )
+                } else {
+                    Icon(imageVector = Icons.Default.Login, contentDescription = null)
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = stringResource(R.string.sign_in_button))
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = stringResource(R.string.sign_in_button))
+
+            Text(
+                text = stringResource(R.string.or_text),
+                modifier = Modifier.padding(top = 12.dp),
+            )
+
+            TextButton(onClick = { onSignIn(true) }) {
+                Text(text = stringResource(R.string.sign_in_anonymously_button))
+            }
         }
 
         Image(

@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.tech.maxclub.firenotes.R
 import com.tech.maxclub.firenotes.feature.auth.domain.models.User
+import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.DeleteAccountDialog
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.NoteList
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.NotesTopAppBar
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.UserProfileDialog
@@ -28,7 +29,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun NotesScreen(
     currentUser: User?,
-    onSignOut: () -> Unit,
+    onSignOut: (Boolean) -> Unit,
     onAddNote: () -> Unit,
     onEditNote: (String) -> Unit,
     onDeleteNote: (String) -> Unit,
@@ -53,7 +54,16 @@ fun NotesScreen(
             user = currentUser,
             notesCount = state.notes.size,
             onSignOut = onSignOut,
+            onDeleteAccount = viewModel::showDeleteAccountDialog,
             onDismiss = viewModel::hideUserProfileDialog,
+        )
+    }
+
+    if (state.isDeleteAccountDialogVisible) {
+        DeleteAccountDialog(
+            isDeleting = state.isAccountDeleting,
+            onDeleteAccount = viewModel::permanentlyDeleteAccount,
+            onDismiss = viewModel::hideDeleteAccountDialog,
         )
     }
 

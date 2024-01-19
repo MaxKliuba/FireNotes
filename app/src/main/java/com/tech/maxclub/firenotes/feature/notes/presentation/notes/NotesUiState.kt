@@ -5,6 +5,8 @@ import com.tech.maxclub.firenotes.feature.notes.domain.models.NoteWithItemsCount
 
 data class NotesUiState(
     val isLoading: Boolean,
-    val isUserProfileDialogVisible: Boolean,
     @Stable val notes: List<NoteWithItemsCount>,
+    val isUserProfileDialogVisible: Boolean,
+    val isDeleteAccountDialogVisible: Boolean,
+    val isAccountDeleting: Boolean,
 )

@@ -27,8 +27,10 @@ class NotesViewModel @Inject constructor(
     private val _uiState = mutableStateOf(
         NotesUiState(
             isLoading = true,
-            isUserProfileDialogVisible = false,
             notes = emptyList(),
+            isUserProfileDialogVisible = false,
+            isDeleteAccountDialogVisible = false,
+            isAccountDeleting = false,
         )
     )
     val uiState: State<NotesUiState> = _uiState
@@ -47,6 +49,14 @@ class NotesViewModel @Inject constructor(
 
     fun hideUserProfileDialog() {
         _uiState.update { it.copy(isUserProfileDialogVisible = false) }
+    }
+
+    fun showDeleteAccountDialog() {
+        _uiState.update { it.copy(isDeleteAccountDialogVisible = true) }
+    }
+
+    fun hideDeleteAccountDialog() {
+        _uiState.update { it.copy(isDeleteAccountDialogVisible = false) }
     }
 
     fun reorderLocalNotes(fromIndex: Int, toIndex: Int) {
@@ -81,6 +91,20 @@ class NotesViewModel @Inject constructor(
         }
     }
 
+    fun permanentlyDeleteAccount() {
+        viewModelScope.launch {
+            try {
+                _uiState.update { it.copy(isAccountDeleting = true) }
+                noteRepository.permanentlyDeleteAccount()
+            } catch (e: NoteRepoException) {
+                e.printStackTrace()
+                uiActionChannel.send(NotesUiAction.ShowNotesErrorMessage(e.message.toString()))
+            } finally {
+                _uiState.update { it.copy(isAccountDeleting = false) }
+            }
+        }
+    }
+
     private fun permanentlyDeleteMarkedNotes() {
         viewModelScope.launch {
             try {
@@ -105,7 +129,7 @@ class NotesViewModel @Inject constructor(
                     )
                 }
             }
-            .catch {e ->
+            .catch { e ->
                 e.printStackTrace()
                 uiActionChannel.send(NotesUiAction.ShowNotesErrorMessage(e.message.toString()))
             }

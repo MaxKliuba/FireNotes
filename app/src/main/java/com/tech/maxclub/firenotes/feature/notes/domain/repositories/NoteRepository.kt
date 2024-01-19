@@ -56,4 +56,10 @@ interface NoteRepository {
 
     @Throws(NoteRepoException::class)
     suspend fun permanentlyDeleteMarkedNoteItems(noteId: String)
+
+    /*
+     * Account
+     */
+    @Throws(NoteRepoException::class)
+    suspend fun permanentlyDeleteAccount()
 }

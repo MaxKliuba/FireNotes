@@ -1,6 +1,5 @@
 package com.tech.maxclub.firenotes.feature.notes.presentation.add_edit_note.components
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -23,21 +22,19 @@ fun CheckedContentTextField(
     onNextAction: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier) {
-        BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
-            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                color = if (checked) Color.Gray else MaterialTheme.colorScheme.onSurface,
-                textDecoration = if (checked) TextDecoration.LineThrough else TextDecoration.None
-            ),
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.secondary),
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Sentences,
-                imeAction = ImeAction.Next,
-            ),
-            keyboardActions = KeyboardActions(onNext = { onNextAction() }),
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        textStyle = MaterialTheme.typography.bodyLarge.copy(
+            color = if (checked) Color.Gray else MaterialTheme.colorScheme.onSurface,
+            textDecoration = if (checked) TextDecoration.LineThrough else TextDecoration.None
+        ),
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.secondary),
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Sentences,
+            imeAction = ImeAction.Next,
+        ),
+        keyboardActions = KeyboardActions(onNext = { onNextAction() }),
+        modifier = modifier.fillMaxWidth()
+    )
 }

@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,7 +41,8 @@ import com.tech.maxclub.firenotes.feature.auth.domain.models.User
 fun UserProfileDialog(
     user: User?,
     notesCount: Int,
-    onSignOut: () -> Unit,
+    onSignOut: (Boolean) -> Unit,
+    onDeleteAccount: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -70,7 +72,7 @@ fun UserProfileDialog(
                         },
                         contentDescription = stringResource(R.string.profile_button),
                         modifier = Modifier
-                            .size(80.dp)
+                            .size(88.dp)
                             .clip(CircleShape)
                             .border(
                                 width = 1.dp,
@@ -98,6 +100,19 @@ fun UserProfileDialog(
                             ),
                             style = MaterialTheme.typography.bodyMedium,
                         )
+
+                        TextButton(
+                            onClick = {
+                                onDeleteAccount()
+                                onDismiss()
+                            },
+                            modifier = modifier.align(Alignment.CenterHorizontally)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.delete_account_button),
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
                     }
                 }
 
@@ -105,7 +120,7 @@ fun UserProfileDialog(
 
                 OutlinedButton(
                     onClick = {
-                        onSignOut()
+                        user?.let { onSignOut(it.isAnonymous) }
                         onDismiss()
                     }
                 ) {

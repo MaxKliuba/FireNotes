@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tech.maxclub.firenotes.feature.auth.domain.exceptions.SignInException
-import com.tech.maxclub.firenotes.feature.auth.domain.models.AuthClient
 import com.tech.maxclub.firenotes.feature.auth.domain.models.User
+import com.tech.maxclub.firenotes.feature.auth.domain.repositories.AuthRepository
 import com.tech.maxclub.firenotes.feature.notes.domain.exceptions.NoteRepoException
 import com.tech.maxclub.firenotes.feature.notes.domain.repositories.NoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val authClient: AuthClient,
+    private val authRepository: AuthRepository,
     private val noteRepository: NoteRepository,
 ) : ViewModel() {
 
@@ -30,13 +30,13 @@ class MainViewModel @Inject constructor(
     val isSigningIn: State<Boolean> = _isSigningIn
 
     val currentUser: StateFlow<User?>
-        get() = authClient.currentUser
+        get() = authRepository.currentUser
 
-    fun beginSignIn() {
+    fun beginSignIn(isAnonymous: Boolean) {
         viewModelScope.launch {
             try {
                 _isSigningIn.value = true
-                authClient.beginSignIn()?.let { intentSender ->
+                authRepository.beginSignIn(isAnonymous)?.let { intentSender ->
                     uiActionChannel.send(MainUiAction.LaunchSignInIntent(intentSender))
                 }
             } catch (e: SignInException) {
@@ -52,7 +52,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _isSigningIn.value = true
-                authClient.signInWithIntent(intent)
+                authRepository.signInWithIntent(intent)
             } catch (e: SignInException) {
                 e.printStackTrace()
                 uiActionChannel.send(MainUiAction.ShowAuthErrorMessage(e.message.toString()))
@@ -62,10 +62,10 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun signOut() {
+    fun signOut(isAnonymous: Boolean) {
         viewModelScope.launch {
             try {
-                authClient.signOut()
+                authRepository.signOut(isAnonymous)
             } catch (e: SignInException) {
                 e.printStackTrace()
                 uiActionChannel.send(MainUiAction.ShowAuthErrorMessage(e.message.toString()))

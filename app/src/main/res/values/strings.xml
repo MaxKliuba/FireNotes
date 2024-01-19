@@ -7,17 +7,24 @@
     <string name="back_button">Back</string>
 
     <string name="sign_in_button">Sign In</string>
+    <string name="or_text">or</string>
+    <string name="sign_in_anonymously_button">Try Anonymously</string>
 
     <string name="profile_button">Profile</string>
-    <string name="sign_out_button">Sign Out</string>
-    <string name="add_note_button">Add note</string>
-    <string name="delete_note_button">Delete note</string>
-    <string name="note_deleted_message">Note deleted</string>
-    <string name="undo_button">Undo</string>
     <plurals name="note_plural">
         <item quantity="one">%1$d note</item>
         <item quantity="other">%1$d notes</item>
     </plurals>
+    <string name="sign_out_button">Sign Out</string>
+    <string name="delete_account_button">Delete Account</string>
+    <string name="delete_account_title">Delete Account?</string>
+    <string name="delete_account_text">This will permanently delete your account and all your information.</string>
+    <string name="delete_account_cancel_button">Cancel</string>
+    <string name="delete_account_confirm_button">Delete Account</string>
+    <string name="add_note_button">Add note</string>
+    <string name="delete_note_button">Delete note</string>
+    <string name="note_deleted_message">Note deleted</string>
+    <string name="undo_button">Undo</string>
     <plurals name="item_plural">
         <item quantity="one">%1$d item</item>
         <item quantity="other">%1$d items</item>
