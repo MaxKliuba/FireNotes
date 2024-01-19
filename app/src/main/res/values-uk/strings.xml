@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pattern">EEEE, d MMM yyyy, HH:mm</string>
+    <string name="language">uk</string>
+    <string name="country">UA</string>
+
+    <string name="back_button">Назад</string>
+
+    <string name="sign_in_button">Увійти</string>
+    <string name="or_text">або</string>
+    <string name="sign_in_anonymously_button">Спробувати анонімно</string>
+
+    <string name="profile_button">Профіль</string>
+    <plurals name="note_plural">
+        <item quantity="one">%1$d нотатка</item>
+        <item quantity="few">%1$d нотатки</item>
+        <item quantity="many">%1$d нотаток</item>
+    </plurals>
+    <string name="sign_out_button">Вийти</string>
+    <string name="delete_account_button">Видалити акаунт</string>
+    <string name="delete_account_title">Видалити акаунт?</string>
+    <string name="delete_account_text">Це назавжди видалить Ваш обліковий запис і всю вашу інформацію.</string>
+    <string name="delete_account_cancel_button">Скасувати</string>
+    <string name="delete_account_confirm_button">Видалити акаунт</string>
+    <string name="add_note_button">Додати нотатку</string>
+    <string name="delete_note_button">Видалити нотатку</string>
+    <string name="note_deleted_message">Нотатку видалено.</string>
+    <string name="undo_button">Скасувати</string>
+    <plurals name="item_plural">
+        <item quantity="one">%1$d елемент</item>
+        <item quantity="few">%1$d елементи</item>
+        <item quantity="many">%1$d елементів</item>
+    </plurals>
+
+    <string name="note_title_placeholder">Назва</string>
+    <string name="share_note_button">Поділитися нотаткою</string>
+    <string name="add_item_button">Додати елемент</string>
+    <string name="add_todo_button">Додати Пункт</string>
+    <string name="add_text_button">Додати Текст</string>
+    <string name="close_button">Закрити</string>
+    <string name="delete_note_item_button">Видалити елемент</string>
+    <string name="note_item_deleted_message">Елемент видалено.</string>
+</resources>
