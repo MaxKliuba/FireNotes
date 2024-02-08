@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="pattern">EEEE, d MMM yyyy, HH:mm</string>
+    <string name="datetime_pattern_24h">EEEE, d MMM yyyy, HH:mm</string>
+    <string name="datetime_pattern_12h">EEEE, d MMM yyyy, hh:mm a</string>
     <string name="language">uk</string>
     <string name="country">UA</string>
 
@@ -33,6 +34,7 @@
     </plurals>
 
     <string name="note_title_placeholder">Назва</string>
+    <string name="empty_note_placeholder">Нотатка…</string>
     <string name="share_note_button">Поділитися нотаткою</string>
     <string name="add_item_button">Додати елемент</string>
     <string name="add_todo_button">Додати Пункт</string>

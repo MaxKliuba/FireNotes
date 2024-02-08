@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -50,7 +51,11 @@ fun AddNoteItemFab(
             Spacer(modifier = Modifier.height(20.dp))
         }
 
-        FloatingActionButton(onClick = { onChangeState(!isOpen) }) {
+        FloatingActionButton(
+            onClick = { onChangeState(!isOpen) },
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+        ) {
             if (isOpen) {
                 Icon(
                     imageVector = Icons.Default.Close,

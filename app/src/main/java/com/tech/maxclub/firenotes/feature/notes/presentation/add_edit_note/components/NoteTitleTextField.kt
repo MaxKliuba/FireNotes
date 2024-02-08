@@ -3,6 +3,7 @@ package com.tech.maxclub.firenotes.feature.notes.presentation.add_edit_note.comp
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -10,8 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import com.tech.maxclub.firenotes.R
@@ -20,6 +21,7 @@ import com.tech.maxclub.firenotes.R
 fun NoteTitleTextField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
+    onNextAction: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -29,8 +31,12 @@ fun NoteTitleTextField(
             textStyle = MaterialTheme.typography.titleLarge.copy(
                 color = MaterialTheme.colorScheme.onSurface
             ),
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.secondary),
-            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                imeAction = onNextAction?.let { ImeAction.Go } ?: ImeAction.Default,
+            ),
+            keyboardActions = onNextAction?.let { KeyboardActions(onGo = { onNextAction() }) }
+                ?: KeyboardActions.Default,
             singleLine = true,
             maxLines = 1,
             modifier = Modifier.fillMaxWidth()

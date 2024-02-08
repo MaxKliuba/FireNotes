@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DragIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,7 +44,7 @@ fun NoteItemTextComponent(
         }
     }
 
-    Row(modifier = modifier.background(color = MaterialTheme.colorScheme.surface)) {
+    Row(modifier = modifier.background(color = MaterialTheme.colorScheme.background)) {
         ContentTextField(
             value = contentValue,
             onValueChange = {
@@ -51,20 +52,23 @@ fun NoteItemTextComponent(
                 onContentChange(noteItem.id, it.text)
             },
             modifier = Modifier
-                .padding(start = 18.dp, top = 12.dp, end = 4.dp, bottom = 12.dp)
+                .padding(start = 18.dp, top = 12.dp, bottom = 12.dp)
                 .heightIn(min = 24.dp)
                 .weight(1f)
                 .focusRequester(focusRequester)
         )
 
-        IconButton(
-            onClick = { onDelete(noteItem.id) },
-            modifier = Modifier.padding(end = 4.dp)
-        ) {
+        IconButton(onClick = { onDelete(noteItem.id) }) {
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = stringResource(R.string.delete_note_item_button),
             )
         }
+
+        Icon(
+            imageVector = Icons.Default.DragIndicator,
+            contentDescription = null,
+            modifier = Modifier.padding(top = 12.dp, end = 16.dp)
+        )
     }
 }

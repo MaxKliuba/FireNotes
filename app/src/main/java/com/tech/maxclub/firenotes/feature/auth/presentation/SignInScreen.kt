@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -86,7 +85,6 @@ fun AppLogo(modifier: Modifier = Modifier) {
             contentDescription = stringResource(id = R.string.app_name),
             modifier = Modifier.size(200.dp)
         )
-        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = stringResource(id = R.string.app_name),
             style = MaterialTheme.typography.headlineLarge,

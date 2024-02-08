@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.tech.maxclub.firenotes.R
+import com.tech.maxclub.firenotes.feature.notes.domain.models.NoteItemType
 import com.tech.maxclub.firenotes.feature.notes.presentation.add_edit_note.components.AddEditNoteTopAppBar
 import com.tech.maxclub.firenotes.feature.notes.presentation.add_edit_note.components.AddNoteItemFab
 import com.tech.maxclub.firenotes.feature.notes.presentation.add_edit_note.components.NoteItemList
@@ -74,6 +75,11 @@ fun AddEditNoteScreen(
                 onDeleteNote = { noteId ->
                     onDeleteNote(noteId)
                     onNavigateUp()
+                },
+                onAddTextItem = if (state.note?.items?.isEmpty() == true) {
+                    { viewModel.addNoteItem(NoteItemType.TEXT) }
+                } else {
+                    null
                 }
             )
         },

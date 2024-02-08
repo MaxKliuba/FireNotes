@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">FireNotes</string>
-    <string name="pattern">EEEE, MMM d yyyy, HH:mm</string>
+    <string name="datetime_pattern_24h">EEEE, MMM d yyyy, HH:mm</string>
+    <string name="datetime_pattern_12h">EEEE, MMM d yyyy, hh:mm a</string>
     <string name="language">en</string>
     <string name="country" />
 
@@ -31,6 +32,7 @@
     </plurals>
 
     <string name="note_title_placeholder">Title</string>
+    <string name="empty_note_placeholder">Content…</string>
     <string name="share_note_button">Share note</string>
     <string name="add_item_button">Add item</string>
     <string name="add_todo_button">Add TODO</string>
