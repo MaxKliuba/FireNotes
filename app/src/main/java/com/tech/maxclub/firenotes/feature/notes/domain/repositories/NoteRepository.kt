@@ -3,7 +3,6 @@ package com.tech.maxclub.firenotes.feature.notes.domain.repositories
 import com.tech.maxclub.firenotes.feature.notes.domain.exceptions.NoteRepoException
 import com.tech.maxclub.firenotes.feature.notes.domain.models.Note
 import com.tech.maxclub.firenotes.feature.notes.domain.models.NoteItem
-import com.tech.maxclub.firenotes.feature.notes.domain.models.NoteWithItemsCount
 import kotlinx.coroutines.flow.Flow
 
 interface NoteRepository {
@@ -11,7 +10,7 @@ interface NoteRepository {
     /*
      * Note
      */
-    fun getNotes(): Flow<List<NoteWithItemsCount>>
+    fun getNotes(): Flow<List<Note>>
 
     fun getNoteById(noteId: String): Flow<Note>
 
@@ -22,7 +21,10 @@ interface NoteRepository {
     suspend fun updateNoteTitle(noteId: String, title: String)
 
     @Throws(NoteRepoException::class)
-    suspend fun updateAllNotesPositions(vararg notes: NoteWithItemsCount)
+    suspend fun updateAllNotesPositions(vararg noteIdWithPositions: Pair<String, Long>)
+
+    @Throws(NoteRepoException::class)
+    suspend fun updateNoteExpanded(noteId: String, expanded: Boolean)
 
     @Throws(NoteRepoException::class)
     suspend fun deleteNoteById(noteId: String)

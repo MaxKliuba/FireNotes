@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
@@ -102,32 +103,54 @@ fun UserProfileDialog(
                             modifier = Modifier.padding(start = 20.dp)
                         )
 
-                        TextButton(
-                            onClick = {
-                                onDeleteAccount()
-                                onDismiss()
-                            },
-                            modifier = Modifier.padding(start = 8.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.delete_account_button),
-                                color = MaterialTheme.colorScheme.error,
-                            )
+                        if (user?.isAnonymous == false) {
+                            TextButton(
+                                onClick = {
+                                    onDeleteAccount()
+                                    onDismiss()
+                                },
+                                modifier = Modifier.padding(start = 8.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.delete_account_button),
+                                    color = MaterialTheme.colorScheme.error,
+                                )
+                            }
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                OutlinedButton(
-                    onClick = {
-                        user?.let { onSignOut(it.isAnonymous) }
-                        onDismiss()
+                if (user?.isAnonymous == true) {
+                    OutlinedButton(
+                        onClick = {
+                            onDeleteAccount()
+                            onDismiss()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.DeleteForever,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.sing_out_and_delete_account_button),
+                            color = MaterialTheme.colorScheme.error,
+                        )
                     }
-                ) {
-                    Icon(imageVector = Icons.Default.Logout, contentDescription = null)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = stringResource(R.string.sign_out_button))
+                } else {
+                    OutlinedButton(
+                        onClick = {
+                            user?.let { onSignOut(it.isAnonymous) }
+                            onDismiss()
+                        }
+                    ) {
+                        Icon(imageVector = Icons.Default.Logout, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = stringResource(R.string.sign_out_button))
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))

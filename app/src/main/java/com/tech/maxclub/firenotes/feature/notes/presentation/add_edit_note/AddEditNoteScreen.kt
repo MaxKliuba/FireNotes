@@ -119,7 +119,7 @@ fun AddEditNoteScreen(
                 NoteItemList(
                     noteItems = note.items,
                     onNoteItemCheckedChange = viewModel::updateNoteItemChecked,
-                    onNoteItemContentChange = viewModel::updateNoteItemContent,
+                    onNoteItemContentChange = viewModel::tryUpdateNoteItemContent,
                     onReorderLocalNoteItems = viewModel::reorderLocalNoteItems,
                     onApplyNoteItemsReorder = viewModel::applyNoteItemsReorder,
                     onAddNoteItem = viewModel::addNoteItem,

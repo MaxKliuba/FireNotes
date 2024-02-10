@@ -28,6 +28,7 @@ import java.util.Date
 import javax.inject.Inject
 
 private const val MAX_TITLE_LENGTH = 100
+private const val MAX_CONTENT_LENGTH = 4096
 
 @HiltViewModel
 class AddEditNoteViewModel @Inject constructor(
@@ -133,7 +134,9 @@ class AddEditNoteViewModel @Inject constructor(
         )
     }
 
-    fun updateNoteItemContent(noteItemId: String, content: String) {
+    fun tryUpdateNoteItemContent(noteItemId: String, content: String): Boolean {
+        if (content.length > MAX_CONTENT_LENGTH) return false
+
         _uiState.value.note?.let { note ->
             try {
                 onUpdateNoteItemContentWithDebounce(note.id, noteItemId, content)
@@ -148,6 +151,8 @@ class AddEditNoteViewModel @Inject constructor(
             AddEditNoteUiAction.ShowNoteErrorMessage("Note not found"),
             viewModelScope
         )
+
+        return true
     }
 
     fun reorderLocalNoteItems(fromIndex: Int, toIndex: Int) {

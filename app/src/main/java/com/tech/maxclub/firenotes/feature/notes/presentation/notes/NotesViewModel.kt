@@ -59,6 +59,17 @@ class NotesViewModel @Inject constructor(
         _uiState.update { it.copy(isDeleteAccountDialogVisible = false) }
     }
 
+    fun updateNoteExpanded(noteId: String, isExpanded: Boolean) {
+        viewModelScope.launch {
+            try {
+                noteRepository.updateNoteExpanded(noteId, isExpanded)
+            } catch (e: NoteRepoException) {
+                e.printStackTrace()
+                uiActionChannel.send(NotesUiAction.ShowNotesErrorMessage(e.message.toString()))
+            }
+        }
+    }
+
     fun reorderLocalNotes(fromIndex: Int, toIndex: Int) {
         try {
             val fromItem = _uiState.value.notes[fromIndex]
@@ -83,7 +94,8 @@ class NotesViewModel @Inject constructor(
     fun applyNotesReorder() {
         viewModelScope.launch {
             try {
-                noteRepository.updateAllNotesPositions(*_uiState.value.notes.toTypedArray())
+                val noteIdWithPositions = _uiState.value.notes.map { it.id to it.position }
+                noteRepository.updateAllNotesPositions(*noteIdWithPositions.toTypedArray())
             } catch (e: NoteRepoException) {
                 e.printStackTrace()
                 uiActionChannel.send(NotesUiAction.ShowNotesErrorMessage(e.message.toString()))

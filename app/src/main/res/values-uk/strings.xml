@@ -19,11 +19,16 @@
     </plurals>
     <string name="sign_out_button">Вийти</string>
     <string name="delete_account_button">Видалити акаунт</string>
+    <string name="sing_out_and_delete_account_button">Вийти і видалити акаунт</string>
     <string name="delete_account_title">Видалити акаунт?</string>
     <string name="delete_account_text">Це назавжди видалить Ваш обліковий запис і всю вашу інформацію.</string>
     <string name="delete_account_cancel_button">Скасувати</string>
     <string name="delete_account_confirm_button">Видалити акаунт</string>
     <string name="add_note_button">Додати нотатку</string>
+    <string name="expand_preview_button">Розгорнути</string>
+    <string name="shrink_preview_button">Згорнути</string>
+    <string name="checked_label">Позначено</string>
+    <string name="not_checked_label">Не позначено</string>
     <string name="delete_note_button">Видалити нотатку</string>
     <string name="note_deleted_message">Нотатку видалено.</string>
     <string name="undo_button">Скасувати</string>

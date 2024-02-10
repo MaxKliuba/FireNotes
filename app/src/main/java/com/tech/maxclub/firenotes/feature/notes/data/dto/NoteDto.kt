@@ -7,5 +7,6 @@ data class NoteDto(
     val title: String = "",
     val timestamp: Long = 0,
     val position: Long = 0,
+    val expanded: Boolean = false,
     val deleted: Boolean = false,
 )

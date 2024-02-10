@@ -14,7 +14,7 @@ sealed class NoteItem(
         id: String = "",
     ) : NoteItem(content, position, id) {
         override fun toContentString(): String =
-            "${if (checked) "[*]" else "[_]"}\t${super.toContentString()}"
+            "${if (checked) "[✓]" else "[ㅤ]"}  ${super.toContentString()}"
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true

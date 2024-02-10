@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DragIndicator
@@ -28,7 +29,7 @@ import com.tech.maxclub.firenotes.feature.notes.domain.models.NoteItem
 @Composable
 fun NoteItemTextComponent(
     noteItem: NoteItem.Text,
-    onContentChange: (String, String) -> Unit,
+    onContentChange: (String, String) -> Boolean,
     onDelete: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -48,17 +49,23 @@ fun NoteItemTextComponent(
         ContentTextField(
             value = contentValue,
             onValueChange = {
-                contentValue = it
-                onContentChange(noteItem.id, it.text)
+                if (onContentChange(noteItem.id, it.text)) {
+                    contentValue = it
+                }
             },
             modifier = Modifier
-                .padding(start = 18.dp, top = 12.dp, bottom = 12.dp)
+                .padding(start = 18.dp, top = 10.dp, bottom = 10.dp)
                 .heightIn(min = 24.dp)
                 .weight(1f)
                 .focusRequester(focusRequester)
         )
 
-        IconButton(onClick = { onDelete(noteItem.id) }) {
+        IconButton(
+            onClick = { onDelete(noteItem.id) },
+            modifier = Modifier
+                .padding(2.dp)
+                .size(40.dp)
+        ) {
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = stringResource(R.string.delete_note_item_button),
@@ -68,7 +75,7 @@ fun NoteItemTextComponent(
         Icon(
             imageVector = Icons.Default.DragIndicator,
             contentDescription = null,
-            modifier = Modifier.padding(top = 12.dp, end = 16.dp)
+            modifier = Modifier.padding(top = 10.dp, end = 16.dp)
         )
     }
 }

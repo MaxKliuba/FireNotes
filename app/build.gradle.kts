@@ -93,7 +93,7 @@ dependencies {
     ksp("com.google.dagger:hilt-android-compiler:$hiltVersion")
 
     // Navigation
-    val navVersion = "2.7.6"
+    val navVersion = "2.7.7"
     implementation("androidx.navigation:navigation-compose:$navVersion")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 

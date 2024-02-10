@@ -6,6 +6,7 @@ data class Note(
     val title: String,
     val timestamp: Long,
     val position: Long,
+    val expanded: Boolean = true,
     @Stable val items: List<NoteItem> = emptyList(),
     val id: String = "",
 ) {

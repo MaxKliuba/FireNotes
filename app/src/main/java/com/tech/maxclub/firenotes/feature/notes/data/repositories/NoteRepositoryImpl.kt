@@ -12,11 +12,9 @@ import com.tech.maxclub.firenotes.feature.notes.data.mappers.toNote
 import com.tech.maxclub.firenotes.feature.notes.data.mappers.toNoteDto
 import com.tech.maxclub.firenotes.feature.notes.data.mappers.toNoteDtoItem
 import com.tech.maxclub.firenotes.feature.notes.data.mappers.toNoteItem
-import com.tech.maxclub.firenotes.feature.notes.data.mappers.toNoteWithItemsCount
 import com.tech.maxclub.firenotes.feature.notes.domain.exceptions.NoteRepoException
 import com.tech.maxclub.firenotes.feature.notes.domain.models.Note
 import com.tech.maxclub.firenotes.feature.notes.domain.models.NoteItem
-import com.tech.maxclub.firenotes.feature.notes.domain.models.NoteWithItemsCount
 import com.tech.maxclub.firenotes.feature.notes.domain.repositories.NoteRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
@@ -43,7 +41,7 @@ class NoteRepositoryImpl @Inject constructor(
     /*
      * Note
      */
-    override fun getNotes(): Flow<List<NoteWithItemsCount>> = callbackFlow {
+    override fun getNotes(): Flow<List<Note>> = callbackFlow {
         val scope = this
 
         val snapshotListener = firestore.collection(collectionPath)
@@ -52,23 +50,22 @@ class NoteRepositoryImpl @Inject constructor(
                     scope.launch {
                         val notes = documents.mapNotNull { document ->
                             async {
-                                val itemsCount = try {
+                                val items = try {
                                     document.reference.collection(ITEMS_COLLECTION_NAME)
                                         .get().await()
                                         .documents.mapNotNull {
                                             it.toObject<NoteItemDto>()?.toNoteItem(it.id)
-                                        }.count()
+                                        }
                                 } catch (e: Exception) {
                                     if (e is CancellationException) {
                                         throw e
                                     } else {
                                         e.printStackTrace()
-                                        0
+                                        emptyList()
                                     }
                                 }
 
-                                document.toObject<NoteDto>()
-                                    ?.toNoteWithItemsCount(document.id, itemsCount)
+                                document.toObject<NoteDto>()?.toNote(document.id, items)
                             }
                         }.awaitAll().filterNotNull()
 
@@ -128,16 +125,28 @@ class NoteRepositoryImpl @Inject constructor(
     }
 
     @Throws(NoteRepoException::class)
-    override suspend fun updateAllNotesPositions(vararg notes: NoteWithItemsCount) {
+    override suspend fun updateAllNotesPositions(vararg noteIdWithPositions: Pair<String, Long>) {
         try {
             val batch = firestore.batch()
 
-            notes.forEach { note ->
-                val documentRef = firestore.collection(collectionPath).document(note.id)
-                batch.update(documentRef, POSITION_FIELD, note.position)
+            noteIdWithPositions.forEach { noteIdWithPosition ->
+                val (noteId, position) = noteIdWithPosition
+                val documentRef = firestore.collection(collectionPath).document(noteId)
+                batch.update(documentRef, POSITION_FIELD, position)
             }
 
             batch.commit().await()
+        } catch (e: Exception) {
+            throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
+        }
+    }
+
+    override suspend fun updateNoteExpanded(noteId: String, expanded: Boolean) {
+        try {
+            firestore.collection(collectionPath)
+                .document(noteId)
+                .update(EXPANDED_FIELD, expanded)
+                .await()
         } catch (e: Exception) {
             throw if (e is CancellationException) e else NoteRepoException(e.localizedMessage)
         }
@@ -394,6 +403,7 @@ class NoteRepositoryImpl @Inject constructor(
         private const val TITLE_FIELD = "title"
         private const val TIMESTAMP_FIELD = "timestamp"
         private const val POSITION_FIELD = "position"
+        private const val EXPANDED_FIELD = "expanded"
         private const val DELETED_FIELD = "deleted"
         private const val CHECKED_FIELD = "checked"
         private const val CONTENT_FIELD = "content"

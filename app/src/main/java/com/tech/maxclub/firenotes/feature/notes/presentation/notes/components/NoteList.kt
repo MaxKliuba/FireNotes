@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
-import com.tech.maxclub.firenotes.feature.notes.domain.models.NoteWithItemsCount
+import com.tech.maxclub.firenotes.feature.notes.domain.models.NoteWithItemsPreview
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
@@ -17,9 +17,10 @@ import org.burnoutcrew.reorderable.reorderable
 
 @Composable
 fun NoteList(
-    notes: List<NoteWithItemsCount>,
+    notes: List<NoteWithItemsPreview>,
     onReorderLocalNotes: (fromIndex: Int, toIndex: Int) -> Unit,
     onApplyNotesReorder: () -> Unit,
+    onNoteExpandedChange: (noteId: String, isExpanded: Boolean) -> Unit,
     onEditNote: (noteId: String) -> Unit,
     onDeleteNote: (noteId: String) -> Unit,
     modifier: Modifier = Modifier
@@ -58,6 +59,7 @@ fun NoteList(
                 NoteComponent(
                     note = note,
                     isDragging = isDragging,
+                    onExpandedChange = onNoteExpandedChange,
                     onEdit = onEditNote,
                     onDelete = onDeleteNote,
                 )

@@ -31,7 +31,7 @@ import org.burnoutcrew.reorderable.reorderable
 fun NoteItemList(
     noteItems: List<NoteItem>,
     onNoteItemCheckedChange: (noteItemId: String, isChecked: Boolean) -> Unit,
-    onNoteItemContentChange: (noteItemId: String, content: String) -> Unit,
+    onNoteItemContentChange: (noteItemId: String, content: String) -> Boolean,
     onReorderLocalNoteItems: (fromIndex: Int, toIndex: Int) -> Unit,
     onApplyNoteItemsReorder: () -> Unit,
     onAddNoteItem: (NoteItemType) -> Unit,
@@ -51,7 +51,7 @@ fun NoteItemList(
     Box(modifier = modifier) {
         LazyColumn(
             state = state.listState,
-            contentPadding = PaddingValues(bottom = 72.dp),
+            contentPadding = PaddingValues(bottom = 76.dp),
             modifier = Modifier
                 .fillMaxSize()
                 .reorderable(state)
@@ -102,7 +102,7 @@ fun NoteItemList(
                     text = stringResource(R.string.empty_note_placeholder),
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.Gray,
-                    modifier = Modifier.padding(start = 18.dp, top = 12.dp)
+                    modifier = Modifier.padding(start = 18.dp, top = 10.dp)
                 )
             }
         }
