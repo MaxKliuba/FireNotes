@@ -288,6 +288,7 @@ class AddEditNoteViewModel @Inject constructor(
                             it.copy(
                                 isLoading = false,
                                 note = note,
+                                isFabOpen = note.items.isEmpty(),
                             )
                         }
                     }

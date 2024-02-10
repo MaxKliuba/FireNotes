@@ -24,6 +24,7 @@
     <string name="delete_account_text">Це назавжди видалить Ваш обліковий запис і всю вашу інформацію.</string>
     <string name="delete_account_cancel_button">Скасувати</string>
     <string name="delete_account_confirm_button">Видалити акаунт</string>
+    <string name="empty_list_text">Список порожній</string>
     <string name="add_note_button">Додати нотатку</string>
     <string name="expand_preview_button">Розгорнути</string>
     <string name="shrink_preview_button">Згорнути</string>

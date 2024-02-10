@@ -22,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.tech.maxclub.firenotes.R
 import com.tech.maxclub.firenotes.feature.auth.domain.models.User
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.DeleteAccountDialog
+import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.EmptyNoteListPlaceholder
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.NoteList
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.NotesTopAppBar
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.UserProfileDialog
@@ -97,17 +98,21 @@ fun NotesScreen(
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center)
                 )
+            } else {
+                if (state.notes.isEmpty()) {
+                    EmptyNoteListPlaceholder(modifier = Modifier.fillMaxSize())
+                } else {
+                    NoteList(
+                        notes = state.notes,
+                        onReorderLocalNotes = viewModel::reorderLocalNotes,
+                        onApplyNotesReorder = viewModel::applyNotesReorder,
+                        onNoteExpandedChange = viewModel::updateNoteExpanded,
+                        onEditNote = onEditNote,
+                        onDeleteNote = onDeleteNote,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
-
-            NoteList(
-                notes = state.notes,
-                onReorderLocalNotes = viewModel::reorderLocalNotes,
-                onApplyNotesReorder = viewModel::applyNotesReorder,
-                onNoteExpandedChange = viewModel::updateNoteExpanded,
-                onEditNote = onEditNote,
-                onDeleteNote = onDeleteNote,
-                modifier = Modifier.fillMaxSize()
-            )
         }
     }
 }

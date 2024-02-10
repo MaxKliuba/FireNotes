@@ -12,7 +12,7 @@ class GetNotesUseCase @Inject constructor(
 ) {
     operator fun invoke(): Flow<List<NoteWithItemsPreview>> =
         noteRepository.getNotes().map { notes ->
-            notes.sortedBy { it.position }
+            notes.sortedByDescending { it.position }
                 .map { note ->
                     note.copy(items = note.items.sortedBy { it.position })
                         .toNoteWithItemsPreview(previewSize = 10)

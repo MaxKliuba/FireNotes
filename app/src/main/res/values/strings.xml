@@ -23,6 +23,7 @@
     <string name="delete_account_text">This will permanently delete your account and all your information.</string>
     <string name="delete_account_cancel_button">Cancel</string>
     <string name="delete_account_confirm_button">Delete Account</string>
+    <string name="empty_list_text">The list is empty</string>
     <string name="add_note_button">Add note</string>
     <string name="expand_preview_button">Expand</string>
     <string name="shrink_preview_button">Shrink</string>
