@@ -19,7 +19,7 @@
     </plurals>
     <string name="sign_out_button">Вийти</string>
     <string name="delete_account_button">Видалити акаунт</string>
-    <string name="sing_out_and_delete_account_button">Вийти і видалити акаунт</string>
+    <string name="sign_out_and_delete_account_button">Вийти і видалити акаунт</string>
     <string name="delete_account_title">Видалити акаунт?</string>
     <string name="delete_account_text">Це назавжди видалить Ваш обліковий запис і всю вашу інформацію.</string>
     <string name="delete_account_cancel_button">Скасувати</string>

@@ -136,7 +136,7 @@ fun UserProfileDialog(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = stringResource(R.string.sing_out_and_delete_account_button),
+                            text = stringResource(R.string.sign_out_and_delete_account_button),
                             color = MaterialTheme.colorScheme.error,
                         )
                     }

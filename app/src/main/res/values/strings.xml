@@ -18,7 +18,7 @@
     </plurals>
     <string name="sign_out_button">Sign Out</string>
     <string name="delete_account_button">Delete Account</string>
-    <string name="sing_out_and_delete_account_button">Sing Out and Delete Account</string>
+    <string name="sign_out_and_delete_account_button">Sign Out and Delete Account</string>
     <string name="delete_account_title">Delete Account?</string>
     <string name="delete_account_text">This will permanently delete your account and all your information.</string>
     <string name="delete_account_cancel_button">Cancel</string>
