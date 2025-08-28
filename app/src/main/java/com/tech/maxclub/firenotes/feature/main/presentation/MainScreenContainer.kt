@@ -7,7 +7,6 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -31,6 +30,7 @@ import com.tech.maxclub.firenotes.R
 import com.tech.maxclub.firenotes.feature.auth.presentation.SignInScreen
 import com.tech.maxclub.firenotes.feature.notes.presentation.add_edit_note.AddEditNoteScreen
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.NotesScreen
+import com.tech.maxclub.firenotes.ui.components.BaseScaffold
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -91,7 +91,7 @@ fun MainScreenContainer(viewModel: MainViewModel = hiltViewModel()) {
         }
     }
 
-    Scaffold(
+    BaseScaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
                 Snackbar(

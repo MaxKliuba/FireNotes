@@ -10,7 +10,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,6 +25,7 @@ import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.Em
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.NoteList
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.NotesTopAppBar
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.UserProfileDialog
+import com.tech.maxclub.firenotes.ui.components.BaseScaffold
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -69,7 +69,7 @@ fun NotesScreen(
         )
     }
 
-    Scaffold(
+    BaseScaffold(
         topBar = {
             NotesTopAppBar(
                 userPhotoUrl = currentUser?.photoUrl,

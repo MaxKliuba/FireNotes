@@ -15,13 +15,13 @@ plugins {
 
 android {
     namespace = "com.tech.maxclub.firenotes"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.tech.maxclub.firenotes"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 6
+        targetSdk = 35
+        versionCode = 7
         versionName = "0.4.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
