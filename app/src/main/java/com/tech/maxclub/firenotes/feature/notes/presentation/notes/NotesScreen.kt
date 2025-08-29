@@ -25,7 +25,7 @@ import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.Em
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.NoteList
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.NotesTopAppBar
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.components.UserProfileDialog
-import com.tech.maxclub.firenotes.ui.components.BaseScaffold
+import com.tech.maxclub.firenotes.ui.components.EdgeToEdgeScaffold
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -69,7 +69,7 @@ fun NotesScreen(
         )
     }
 
-    BaseScaffold(
+    EdgeToEdgeScaffold(
         topBar = {
             NotesTopAppBar(
                 userPhotoUrl = currentUser?.photoUrl,

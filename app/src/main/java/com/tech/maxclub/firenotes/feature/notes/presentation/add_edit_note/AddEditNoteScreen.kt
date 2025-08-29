@@ -5,10 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
@@ -24,7 +21,8 @@ import com.tech.maxclub.firenotes.feature.notes.domain.models.NoteItemType
 import com.tech.maxclub.firenotes.feature.notes.presentation.add_edit_note.components.AddEditNoteTopAppBar
 import com.tech.maxclub.firenotes.feature.notes.presentation.add_edit_note.components.AddNoteItemFab
 import com.tech.maxclub.firenotes.feature.notes.presentation.add_edit_note.components.NoteItemList
-import com.tech.maxclub.firenotes.ui.components.BaseScaffold
+import com.tech.maxclub.firenotes.ui.components.BaseSnackbarHost
+import com.tech.maxclub.firenotes.ui.components.EdgeToEdgeScaffold
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -65,7 +63,7 @@ fun AddEditNoteScreen(
         }
     }
 
-    BaseScaffold(
+    EdgeToEdgeScaffold(
         topBar = {
             AddEditNoteTopAppBar(
                 note = state.note,
@@ -93,15 +91,7 @@ fun AddEditNoteScreen(
             }
         },
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { data ->
-                Snackbar(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    actionColor = MaterialTheme.colorScheme.primary,
-                    dismissActionContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    snackbarData = data,
-                )
-            }
+            BaseSnackbarHost(hostState = snackbarHostState)
         },
     ) { paddingValues ->
         Box(

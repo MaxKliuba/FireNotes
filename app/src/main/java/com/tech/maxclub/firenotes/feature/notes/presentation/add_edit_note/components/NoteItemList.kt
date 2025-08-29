@@ -1,6 +1,5 @@
 package com.tech.maxclub.firenotes.feature.notes.presentation.add_edit_note.components
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,7 +25,6 @@ import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NoteItemList(
     noteItems: List<NoteItem>,
@@ -76,7 +74,7 @@ fun NoteItemList(
                             noteItem = noteItem,
                             onContentChange = onNoteItemContentChange,
                             onDelete = onDeleteNoteItem,
-                            modifier = Modifier.animateItemPlacement()
+                            modifier = Modifier.animateItem()
                         )
 
                         is NoteItem.ToDo -> NoteItemToDoComponent(
@@ -85,7 +83,7 @@ fun NoteItemList(
                             onContentChange = onNoteItemContentChange,
                             onAddToDoItem = { onAddNoteItem(NoteItemType.TODO) },
                             onDelete = onDeleteNoteItem,
-                            modifier = Modifier.animateItemPlacement()
+                            modifier = Modifier.animateItem()
                         )
                     }
                 }

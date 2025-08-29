@@ -15,13 +15,13 @@ plugins {
 
 android {
     namespace = "com.tech.maxclub.firenotes"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.tech.maxclub.firenotes"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 7
+        targetSdk = 36
+        versionCode = 8
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -86,6 +86,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.6")
     implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.36.0")
 
     // Hilt
     val hiltVersion = "2.48.1"
@@ -93,8 +94,7 @@ dependencies {
     ksp("com.google.dagger:hilt-android-compiler:$hiltVersion")
 
     // Navigation
-    val navVersion = "2.7.7"
-    implementation("androidx.navigation:navigation-compose:$navVersion")
+    implementation("androidx.navigation:navigation-compose:$2.7.7")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
     // Firebase BoM
@@ -108,5 +108,5 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore:24.10.1")
 
     // Coil
-    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
 }

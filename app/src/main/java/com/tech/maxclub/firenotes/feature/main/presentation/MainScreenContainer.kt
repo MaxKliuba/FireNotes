@@ -5,11 +5,13 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Snackbar
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
@@ -30,7 +32,8 @@ import com.tech.maxclub.firenotes.R
 import com.tech.maxclub.firenotes.feature.auth.presentation.SignInScreen
 import com.tech.maxclub.firenotes.feature.notes.presentation.add_edit_note.AddEditNoteScreen
 import com.tech.maxclub.firenotes.feature.notes.presentation.notes.NotesScreen
-import com.tech.maxclub.firenotes.ui.components.BaseScaffold
+import com.tech.maxclub.firenotes.ui.components.BaseSnackbarHost
+import com.tech.maxclub.firenotes.ui.components.EdgeToEdgeScaffold
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -91,23 +94,18 @@ fun MainScreenContainer(viewModel: MainViewModel = hiltViewModel()) {
         }
     }
 
-    BaseScaffold(
+    EdgeToEdgeScaffold(
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState) { data ->
-                Snackbar(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    actionColor = MaterialTheme.colorScheme.primary,
-                    dismissActionContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    snackbarData = data,
-                )
-            }
-        }
+            BaseSnackbarHost(hostState = snackbarHostState)
+        },
+        modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)
     ) { paddingValues ->
         NavHost(
             navController = navController,
             startDestination = startDestination,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .padding(paddingValues)
+                .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime))
         ) {
             composable(route = Screen.SignIn.route) {
                 SignInScreen(
