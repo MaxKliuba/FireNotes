@@ -30,7 +30,7 @@ android {
         }
 
         val webClientId: String =
-            gradleLocalProperties(rootDir).getProperty("WEB_CLIENT_ID") ?: "null"
+            gradleLocalProperties(rootDir, providers).getProperty("WEB_CLIENT_ID") ?: "null"
         buildConfigField("String", "WEB_CLIENT_ID", "\"$webClientId\"")
     }
 
